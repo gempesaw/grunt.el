@@ -1,7 +1,10 @@
 (source gnu)
 (source melpa)
 
-(package "grunt" "0.0.1" "Some glue to stick Emacs and gruntfiles together")
+(package-file "grunt.el")
+
+(depends-on "dash")
+(depends-on "f")
 
 (development
  (depends-on "dash")
