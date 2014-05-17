@@ -118,7 +118,7 @@ gruntfile and pulls in the user specified `grunt-options'"
   (format "%s %s"
         (mapconcat
          (lambda (item)
-           (format "--%s %s" (car item) (cadr item)))
+           (format "--%s %s" (car item) (shell-quote-argument (cadr item))))
          `(("base" ,grunt-current-dir)
            ("gruntfile" ,grunt-current-path))
          " ")
@@ -134,11 +134,10 @@ gruntfile and pulls in the user specified `grunt-options'"
                         (if directory
                             directory
                           default-directory) "Gruntfile.js")))
-    (if gruntfile-dir
-        (setq grunt-current-dir gruntfile-dir
-              grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
-              grunt-current-path (format "%sGruntfile.js" gruntfile-dir))
-      nil)))
+    (when gruntfile-dir
+      (setq grunt-current-dir gruntfile-dir
+            grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
+            grunt-current-path (format "%sGruntfile.js" gruntfile-dir)))))
 
 
 
