@@ -53,6 +53,7 @@ We'll try to find this on our own.")
 (defvar grunt-current-project ""
   "Name of the current project in which the Gruntfile is found")
 
+;;;###autoload
 (defun grunt-exec (&optional pfx)
   "Invoke this while in your project and it will suggest
 registered tasks. You can also manually enter in a specific task
