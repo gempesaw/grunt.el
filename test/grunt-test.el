@@ -46,23 +46,20 @@
 (ert-deftest should-locate-gruntfiles-from-inside ()
   (with-sandbox
    (let* ((root "has-gruntfile")
-          (new-dir (format "%s/and/some/nested/directories/" root))
-          (default-directory (f-expand "has-gruntfile" root-sandbox-path)))
-     (f-mkdir default-directory)
-     (f-touch (f-expand "Gruntfile.js" default-directory))
-     (should (string-suffix-p (format "%s/Gruntfile.js" root) (grunt-locate-gruntfile))))))
+         (root-dir (f-expand root root-sandbox-path))
+         (nested-dir (f-expand "nested" root-dir))
+         (default-directory nested-dir))
+    (f-mkdir root-dir nested-dir)
+    (f-touch (f-expand "Gruntfile.js" root-dir))
+    (should (string-suffix-p (format "%s/Gruntfile.js" root) (grunt-locate-gruntfile))))))
 
 (ert-deftest should-fail-if-gruntfile-is-missing ()
   (with-sandbox
-   (let* ((new-dir "has-gruntfile")
-          (default-directory (f-expand new-dir root-sandbox-path)))
-     (f-mkdir default-directory)
-     (should (equal nil (grunt-locate-gruntfile))))))
+   (should (equal nil (grunt-locate-gruntfile)))))
 
 (ert-deftest should-locate-current-project ()
   (with-sandbox
    (let* ((root "has-gruntfile")
-          (new-dir (format "%s/and/some/nested/directories/" root))
           (default-directory (f-expand "has-gruntfile" root-sandbox-path)))
      (f-mkdir default-directory)
      (f-touch (f-expand "Gruntfile.js" default-directory))
@@ -71,8 +68,8 @@
 
 (ert-deftest should-resolve-registered-tasks ()
   (with-sandbox
-   (let* ((new-dir "has-gruntfile")
-          (default-directory (f-expand new-dir root-sandbox-path)))
+   (let* ((root "has-gruntfile")
+          (default-directory (f-expand root root-sandbox-path)))
      (f-mkdir default-directory)
      (f-write "grunt.registerTask('build', ["
               'utf-8
