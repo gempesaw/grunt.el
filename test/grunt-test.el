@@ -15,6 +15,8 @@
 (defvar root-sandbox-path
   (f-expand "sandbox" root-test-path))
 
+(defvar mock-gruntfile-dir "has-gruntfile")
+
 (require 'grunt (f-expand "grunt.el" root-code-path))
 
 (defmacro with-sandbox (&rest body)
@@ -28,7 +30,7 @@
 
 (defmacro with-grunt-sandbox (&rest body)
   "Evaluate BODY in an empty temporary directory."
-  `(let ((default-directory (f-expand "has-gruntfile" root-sandbox-path)))
+  `(let ((default-directory (f-expand mock-gruntfile-dir root-sandbox-path)))
      (when (f-dir? root-sandbox-path)
        (f-delete root-sandbox-path :force))
      (f-mkdir root-sandbox-path default-directory)
@@ -37,45 +39,33 @@
      (f-delete root-sandbox-path :force)))
 
 (ert-deftest should-locate-gruntfiles ()
-  (with-sandbox
-   (let* ((new-dir "has-gruntfile")
-          (default-directory (f-expand new-dir root-sandbox-path)))
-     (f-mkdir default-directory)
-     (f-touch (f-expand "Gruntfile.js" default-directory))
-     (should (string-suffix-p (format "%s/Gruntfile.js" new-dir) (grunt-locate-gruntfile))))))
+  (with-grunt-sandbox
+   (should (string-suffix-p (format "%s/Gruntfile.js" mock-gruntfile-dir) (grunt-locate-gruntfile)))))
 
 (ert-deftest should-locate-gruntfiles-from-inside ()
-  (with-sandbox
-   (let* ((root "has-gruntfile")
-         (root-dir (f-expand root root-sandbox-path))
-         (nested-dir (f-expand "nested" root-dir))
-         (default-directory nested-dir))
-    (f-mkdir root-dir nested-dir)
-    (f-touch (f-expand "Gruntfile.js" root-dir))
-    (should (string-suffix-p (format "%s/Gruntfile.js" root) (grunt-locate-gruntfile))))))
+  (with-grunt-sandbox
+   (let* ((root-dir (f-expand mock-gruntfile-dir root-sandbox-path))
+          (nested-dir (f-expand "nested" root-dir))
+          (default-directory nested-dir))
+     (f-mkdir root-dir nested-dir)
+     (should (string-suffix-p (format "%s/Gruntfile.js" mock-gruntfile-dir) (grunt-locate-gruntfile))))))
 
 (ert-deftest should-fail-if-gruntfile-is-missing ()
   (with-sandbox
    (should (equal nil (grunt-locate-gruntfile)))))
 
 (ert-deftest should-locate-current-project ()
-  (with-sandbox
-   (let* ((root "has-gruntfile")
-          (default-directory (f-expand "has-gruntfile" root-sandbox-path)))
-     (f-mkdir default-directory)
-     (f-touch (f-expand "Gruntfile.js" default-directory))
-     (grunt-locate-gruntfile)
-     (should (string= root grunt-current-project)))))
+  (with-grunt-sandbox
+   (setq grunt-current-project "")
+   (grunt-locate-gruntfile)
+   (should (string= mock-gruntfile-dir grunt-current-project))))
 
 (ert-deftest should-resolve-registered-tasks ()
-  (with-sandbox
-   (let* ((root "has-gruntfile")
-          (default-directory (f-expand root root-sandbox-path)))
-     (f-mkdir default-directory)
-     (f-write "grunt.registerTask('build', ["
-              'utf-8
-              (f-expand "Gruntfile.js" default-directory))
-     (should (string= "build" (car (grunt-resolve-registered-tasks)))))))
+  (with-grunt-sandbox
+   (f-write "grunt.registerTask('build', ["
+            'utf-8
+            (f-expand "Gruntfile.js" default-directory))
+   (should (string= "build" (car (grunt-resolve-registered-tasks))))))
 
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
