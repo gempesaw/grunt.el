@@ -5,7 +5,7 @@
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; Version: 0.0.1
-;; Package-Requires: ((f "0.16.2") (dash "2.6.0"))
+;; Package-Requires: ((dash "2.6.0"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,6 @@
 
 ;;; Code:
 
-(require 'f)
 (require 'dash)
 
 (defvar grunt-base-command (executable-find "grunt")
@@ -105,18 +104,17 @@ executed."
 
 (defun grunt-locate-gruntfile (&optional directory)
   "Search the current directory and upwards for a Gruntfile."
-  (let ((gruntfile-dir (f--traverse-upwards
-                        (f-exists? (format "%s/Gruntfile.js" it))
-                        (f-expand (if directory
-                                      directory
-                                    (cadr (split-string (pwd) " " t)))))))
+  (let ((gruntfile-dir (locate-dominating-file
+                        (if directory
+                            directory
+                          default-directory) "Gruntfile.js")))
     (if gruntfile-dir
-        (progn
-          (setq grunt-current-path (format "%s/Gruntfile.js" gruntfile-dir)
-                grunt-current-dir gruntfile-dir
-                grunt-current-project (cadr (reverse (split-string grunt-current-path "/"))))
-          grunt-current-path)
+        (setq grunt-current-dir gruntfile-dir
+              grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
+              grunt-current-path (format "%sGruntfile.js" gruntfile-dir))
       nil)))
+
+
 
 (provide 'grunt)
 ;;; grunt.el ends here
