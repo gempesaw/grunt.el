@@ -91,8 +91,10 @@ registered."
     (async-shell-command command buf buf)))
 
 (defun grunt-resolve-registered-tasks ()
-  "Build an incomplete list of potential tasks by searching for
-registerTask in the Gruntfile. This is incredibly fragile and
+  "Build a list of potential Grunt tasks
+
+The list is constructed by searching for registerTask in the
+Gruntfile at `grunt-current-path'. This is incredibly fragile and
 will break on something as simple as an alternate quoting scheme
 or indentation, and it _only_ supports manually registered
 tasks."
