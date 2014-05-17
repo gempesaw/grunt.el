@@ -27,6 +27,12 @@
 ;; kick off Grunt tasks. This package provides rudimentary access to
 ;; the tasks in a Gruntfile.
 
+;; When your default-directory is somewhere in a JS project with a
+;; Gruntfile, invoke `grunt-exec' or bind something to it. You can
+;; either execute one of the suggested registered tasks, or input a
+;; custom task of your own. It will create one buffer per project per
+;; task.
+
 ;;; Code:
 
 (require 'dash)
