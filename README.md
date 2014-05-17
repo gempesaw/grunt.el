@@ -6,13 +6,14 @@ management per task or project.
 
 ## installation
 
-Use MELPA: `M-x package-install <RET> grunt <RET>`
+Use MELPA: `M-x package-install <RET> grunt <RET>`. Or, get `grunt.el`
+in your load-path and do a `(require 'grunt)`.
 
 ## usage
 
-Figure out what you want to bind `grunt-exec` to, or just invoke it
-via `M-x` while your current buffer is in a repo with a Gruntfile
-somewhere.
+Figure out what keybinding you'd like to bind `grunt-exec` to, or just
+invoke it via `M-x` while your current buffer is in a repo with a
+Gruntfile somewhere.
 
     ;; currently experimenting with "C-M-g"
     (global-set-key (kbd "C-M-g") 'grunt-exec)
@@ -21,6 +22,9 @@ It'll try to find your Gruntfile and suggest tasks to run if it can
 find them:
 
 ![screenshot.png](screenshot.png)
+
+It'll traverse upwards the same way that magit does in search of a
+Gruntfile, or just bail out if it can't find one.
 
 ## development
 
