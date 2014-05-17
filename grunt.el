@@ -78,7 +78,8 @@ We'll try to find this on our own."
 registered tasks.
 
 You can also manually enter in a specific task that isn't
-registered."
+registered. It will get/create one buffer per task per project,
+as needed."
   (interactive)
   (unless (grunt-locate-gruntfile)
     (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
@@ -124,9 +125,7 @@ gruntfile and pulls in the user specified `grunt-options'"
         grunt-options))
 
 (defun grunt--command (task)
-  "Return the grunt command for the specified task, ready to be
-executed."
-  (grunt-resolve-options)
+  "Return the grunt command for the specified TASK"
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt-locate-gruntfile (&optional directory)
