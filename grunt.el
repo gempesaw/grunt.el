@@ -109,22 +109,24 @@ tasks."
                    contents))))
 
 (defun grunt-resolve-options ()
-  "Set up the arguments to the grunt binary so that we can call
-it from any directory with any gruntfile."
-  (setq grunt-options
-        (let ((opts))
-          (mapc
-           (lambda (item)
-             (setq opts (format "--%s %s" (car item) (cadr item))))
-           `(("base" ,grunt-current-dir)
-             ("gruntfile" ,grunt-current-path)))
-          opts)))
+  "Set up the arguments to the grunt binary
+
+This lets us invoke grunt properly from any directory with any
+gruntfile and pulls in the user specified `grunt-options'"
+  (format "%s %s"
+        (mapconcat
+         (lambda (item)
+           (format "--%s %s" (car item) (cadr item)))
+         `(("base" ,grunt-current-dir)
+           ("gruntfile" ,grunt-current-path))
+         " ")
+        grunt-options))
 
 (defun grunt--command (task)
   "Return the grunt command for the specified task, ready to be
 executed."
   (grunt-resolve-options)
-  (mapconcat 'identity `(,grunt-base-command ,grunt-options ,task) " "))
+  (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt-locate-gruntfile (&optional directory)
   "Search the current directory and upwards for a Gruntfile."

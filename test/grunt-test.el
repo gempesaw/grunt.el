@@ -68,3 +68,9 @@
               'utf-8
               (f-expand "Gruntfile.js" default-directory))
      (should (string= "build" (car (grunt-resolve-registered-tasks)))))))
+
+(ert-deftest should-include-custom-options ()
+  (with-grunt-sandbox
+   (let ((grunt-options "expected-option-string"))
+     (grunt-locate-gruntfile)
+     (should (string-match-p grunt-options (grunt-resolve-options))))))
