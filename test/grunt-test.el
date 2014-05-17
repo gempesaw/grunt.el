@@ -25,6 +25,16 @@
      ,@body
      (f-delete root-sandbox-path :force)))
 
+(defmacro with-grunt-sandbox (&rest body)
+  "Evaluate BODY in an empty temporary directory."
+  `(let ((default-directory (f-expand "has-gruntfile" root-sandbox-path)))
+     (when (f-dir? root-sandbox-path)
+       (f-delete root-sandbox-path :force))
+     (f-mkdir root-sandbox-path default-directory)
+     (f-touch (f-expand "Gruntfile.js" default-directory))
+     ,@body
+     (f-delete root-sandbox-path :force)))
+
 (ert-deftest should-locate-gruntfiles ()
   (with-sandbox
    (let* ((new-dir "has-gruntfile")
