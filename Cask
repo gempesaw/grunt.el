@@ -3,9 +3,6 @@
 
 (package-file "grunt.el")
 
-(depends-on "dash")
-(depends-on "f")
-
 (development
  (depends-on "dash")
  (depends-on "ert-runner")

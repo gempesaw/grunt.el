@@ -5,6 +5,7 @@
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; Version: 0.0.1
+;; Package-Requires: ((f "0.16.2") (dash "2.6.0"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -115,8 +116,6 @@ executed."
                 grunt-current-project (cadr (reverse (split-string grunt-current-path "/"))))
           grunt-current-path)
       nil)))
-
-;; (global-set-key (kbd "C-M-g") 'grunt-exec)
 
 (provide 'grunt)
 ;;; grunt.el ends here
