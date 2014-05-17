@@ -30,11 +30,15 @@
 
 (defmacro with-grunt-sandbox (&rest body)
   "Evaluate BODY in an empty temporary directory."
-  `(let ((default-directory (f-expand mock-gruntfile-dir root-sandbox-path)))
+  `(let ((default-directory (f-expand mock-gruntfile-dir root-sandbox-path))
+         (grunt-current-path "")
+         (grunt-current-dir "")
+         (grunt-current-project ""))
      (when (f-dir? root-sandbox-path)
        (f-delete root-sandbox-path :force))
      (f-mkdir root-sandbox-path default-directory)
      (f-touch (f-expand "Gruntfile.js" default-directory))
+     (grunt-locate-gruntfile)
      ,@body
      (f-delete root-sandbox-path :force)))
 
@@ -56,8 +60,6 @@
 
 (ert-deftest should-locate-current-project ()
   (with-grunt-sandbox
-   (setq grunt-current-project "")
-   (grunt-locate-gruntfile)
    (should (string= mock-gruntfile-dir grunt-current-project))))
 
 (ert-deftest should-resolve-registered-tasks ()
@@ -70,12 +72,10 @@
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
    (let ((grunt-options "expected-option-string"))
-     (grunt-locate-gruntfile)
      (should (string-match-p grunt-options (grunt-resolve-options))))))
 
 (ert-deftest should-construct-valid-command ()
   (with-grunt-sandbox
-   (grunt-locate-gruntfile)
    (let ((cmd (grunt--command "task")))
      (should (string-match-p " --base /.*has-gruntfile" cmd))
      (should (string-match-p " --gruntfile /.*Gruntfile.js" cmd))
