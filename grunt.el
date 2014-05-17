@@ -1,10 +1,11 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
+;; Version: 0.0.1
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
-;; Version: 0.0.1
+;; URL:: https://github.com/gempesaw/grunt.el
 ;; Package-Requires: ((dash "2.6.0"))
 ;; Created: 2014 Apr 1
 
