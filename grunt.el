@@ -72,15 +72,18 @@ We'll try to find this on our own."
   :group 'grunt)
 
 ;;;###autoload
-(defun grunt-exec (&optional pfx)
+(defun grunt-exec ()
   "Invoke this while in your project and it will suggest
-registered tasks. You can also manually enter in a specific task
-that isn't registered."
-  (interactive "P")
-  (if (eq nil (grunt-locate-gruntfile))
-      (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?")
-    )
-  (let* ((task (ido-completing-read "Execute which task: " (grunt-resolve-registered-tasks) nil nil))
+registered tasks.
+
+You can also manually enter in a specific task that isn't
+registered."
+  (interactive)
+  (unless (grunt-locate-gruntfile)
+    (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
+  (let* ((task (ido-completing-read
+                "Execute which task: "
+                (grunt-resolve-registered-tasks) nil nil))
          (command (grunt--command task))
          (buf (get-buffer-create
                (format "*grunt-%s*<%s>" task grunt-current-project)))
