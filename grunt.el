@@ -31,26 +31,39 @@
 
 (require 'dash)
 
-(defvar grunt-base-command (executable-find "grunt")
+(defgroup grunt nil
+  "Execute grunt tasks from your Gruntfile from Emacs"
+  :group 'convenience)
+
+(defcustom grunt-base-command (executable-find "grunt")
   "The base grunt command; you may have to fix this if `grunt'
-  isn't in your PATH")
+isn't in your PATH"
+  :type '(string)
+  :group 'grunt)
 
-(defvar grunt-options ""
-  "Additional options that will be passed to grunt when invoked
-  through `grunt-exec'")
+(defcustom grunt-options ""
+  "Additional options to pass to grunt"
+  :type '(string)
+  :group 'grunt)
 
-(defvar grunt-current-path ""
+(defcustom grunt-current-path ""
   "Path to the current gruntfile.
 
-We'll try to find this on our own.")
+We'll try to find this on our own."
+  :type '(string)
+  :group 'grunt)
 
-(defvar grunt-current-dir ""
+(defcustom grunt-current-dir ""
   "Path to the directory of the current gruntfile.
 
-We'll try to find this on our own.")
+We'll try to find this on our own."
+  :type '(string)
+  :group 'grunt)
 
-(defvar grunt-current-project ""
-  "Name of the current project in which the Gruntfile is found")
+(defcustom grunt-current-project ""
+  "Name of the current project in which the Gruntfile is found"
+  :type '(string)
+  :group 'grunt)
 
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
