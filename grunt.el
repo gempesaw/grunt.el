@@ -1,5 +1,5 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
-;; Version: 0.0.1
+;; Version: 0.0.2
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 
@@ -43,9 +43,10 @@
   :group 'convenience)
 
 (defcustom grunt-base-command (executable-find "grunt")
-  "The base grunt command; you may have to fix this if `grunt'
-isn't in your PATH"
-  :type '(string)
+  "The path to the grunt binary.
+
+You may have to fix this if `grunt' isn't in your PATH."
+  :type 'string
   :group 'grunt)
 
 (defcustom grunt-options ""
@@ -126,6 +127,8 @@ gruntfile and pulls in the user specified `grunt-options'"
 
 (defun grunt--command (task)
   "Return the grunt command for the specified TASK"
+  (unless grunt-base-command
+    (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt-locate-gruntfile (&optional directory)

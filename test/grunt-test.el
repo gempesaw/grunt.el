@@ -42,6 +42,9 @@
      ,@body
      (f-delete root-sandbox-path :force)))
 
+(ert-deftest should-find-grunt-binary-in-path ()
+  (should (not (eq nil grunt-base-command))))
+
 (ert-deftest should-locate-gruntfiles ()
   (with-grunt-sandbox
    (should (string-suffix-p (format "%s/Gruntfile.js" mock-gruntfile-dir) (grunt-locate-gruntfile)))))
