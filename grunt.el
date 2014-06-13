@@ -91,6 +91,7 @@ as needed."
          (buf (get-buffer-create
                (format "*grunt-%s*<%s>" task grunt-current-project)))
          (default-directory grunt-current-dir))
+    (message "%s" command)
     (async-shell-command command buf buf)))
 
 (defun grunt-resolve-registered-tasks ()
