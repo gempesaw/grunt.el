@@ -134,13 +134,13 @@ gruntfile and pulls in the user specified `grunt-options'"
 
 (defun grunt-locate-gruntfile (&optional directory)
   "Search the current directory and upwards for a Gruntfile."
-  (let ((gruntfile-dir (file-truename
-                        (locate-dominating-file
-                         (if directory
-                             directory
-                           default-directory) "Gruntfile.js"))))
+  (let ((gruntfile-dir (locate-dominating-file
+                        (if directory
+                            directory
+                          default-directory) "Gruntfile.js")))
     (when gruntfile-dir
-      (setq grunt-current-dir gruntfile-dir
+      (setq gruntfile-dir (file-truename gruntfile-dir)
+            grunt-current-dir gruntfile-dir
             grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
             grunt-current-path (format "%sGruntfile.js" gruntfile-dir)))))
 
