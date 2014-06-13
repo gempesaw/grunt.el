@@ -117,13 +117,13 @@ tasks."
 This lets us invoke grunt properly from any directory with any
 gruntfile and pulls in the user specified `grunt-options'"
   (format "%s %s"
-        (mapconcat
-         (lambda (item)
-           (format "--%s %s" (car item) (shell-quote-argument (cadr item))))
-         `(("base" ,grunt-current-dir)
-           ("gruntfile" ,grunt-current-path))
-         " ")
-        grunt-options))
+          (mapconcat
+           (lambda (item)
+             (format "--%s %s" (car item) (shell-quote-argument (cadr item))))
+           `(("base" ,grunt-current-dir)
+             ("gruntfile" ,grunt-current-path))
+           " ")
+          grunt-options))
 
 (defun grunt--command (task)
   "Return the grunt command for the specified TASK"
