@@ -19,6 +19,15 @@
 
 (require 'grunt (f-expand "grunt.el" root-code-path))
 
+(if (not (boundp 'string-suffix-p))
+		(defun string-suffix-p (str1 str2 &optional ignore-case)
+			(let ((begin2 (- (length str2) (length str1)))
+						(end2 (length str2)))
+				(when (< begin2 0) (setq begin2 0))
+				(eq t (compare-strings str1 nil nil
+															 str2 begin2 end2
+															 ignore-case)))))
+
 (defmacro with-sandbox (&rest body)
   "Evaluate BODY in an empty temporary directory."
   `(let ((default-directory root-sandbox-path))
