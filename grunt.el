@@ -105,12 +105,12 @@ tasks."
   (let* ((contents (with-temp-buffer
                      (insert-file-contents grunt-current-path)
                      (split-string (buffer-string) "\n"))))
-		(-map (lambda (line)
-						(string-match "[\"']\\\(.*?\\\)[\"\']" line)
-						(match-string 1 line))
-					(-filter (lambda (line)
-										 (string-match-p "registerTask" line))
-									 contents))))
+    (-map (lambda (line)
+            (string-match "[\"']\\\(.*?\\\)[\"\']" line)
+            (match-string 1 line))
+          (-filter (lambda (line)
+                     (string-match-p "registerTask" line))
+                   contents))))
 
 (defun grunt-resolve-options ()
   "Set up the arguments to the grunt binary
