@@ -76,10 +76,15 @@
 
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
-   (f-write "grunt.registerTask('build', ["
+   (f-write "grunt.registerTask('test', ["
             'utf-8
             (f-expand "Gruntfile.js" default-directory))
-   (should (string= "build" (car (grunt-resolve-registered-tasks))))))
+   (should (string= "test" (car (grunt-resolve-registered-tasks))))
+
+   (f-write "grunt.registerTask(\"test2\""
+            'utf-8
+            (f-expand "Gruntfile.js" default-directory))
+   (should (string= "test2" (car (grunt-resolve-registered-tasks))))))
 
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
