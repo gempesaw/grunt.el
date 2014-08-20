@@ -19,12 +19,13 @@ Gruntfile somewhere.
     (global-set-key (kbd "C-M-g") 'grunt-exec)
 
 It'll try to find your Gruntfile and suggest tasks to run if it can
-find them:
+find them. Although `grunt.el` only knows how to find registered
+tasks, you can also enter in any valid Grunt task at the prompt.
 
 ![screenshot.png](screenshot.png)
 
-It'll traverse upwards the same way that magit does in search of a
-Gruntfile, or just bail out if it can't find one.
+It'll traverse upwards from your current working directory in search
+of a Gruntfile, or bail out if it can't find one.
 
 ## development
 
