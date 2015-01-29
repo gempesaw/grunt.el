@@ -108,3 +108,10 @@
            (buf (buffer-name (cadr args))))
        (should (string-suffix-p "build" cmd))
        (should (string= "*grunt-build*<has-gruntfile>" buf))))))
+
+(ert-deftest should-kill-existing-buffer ()
+  (with-grunt-sandbox
+   (noflet ((ido-completing-read (&rest any) "build"))
+     (grunt-exec)
+     (grunt-exec)
+     (should t))))

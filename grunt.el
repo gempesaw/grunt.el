@@ -1,5 +1,5 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
-;; Version: 0.0.2
+;; Version: 0.0.3
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 
@@ -32,7 +32,7 @@
 ;; Gruntfile, invoke `grunt-exec' or bind something to it. You can
 ;; either execute one of the suggested registered tasks, or input a
 ;; custom task of your own. It will create one buffer per project per
-;; task.
+;; task, killing any existing buffers by default.
 
 ;;; Code:
 
@@ -41,6 +41,15 @@
 (defgroup grunt nil
   "Execute grunt tasks from your Gruntfile from Emacs"
   :group 'convenience)
+
+(defcustom grunt-kill-existing-buffer t
+  "Whether or not to kill the existing process buffer
+
+Defaults to t. When not nil, we will try to kill the buffer name
+that we construct to do our task. Of course, if you rename your
+buffer, we won't be able to kill it."
+  :type 'boolean
+  :group 'grunt)
 
 (defcustom grunt-base-command (executable-find "grunt")
   "The path to the grunt binary.
@@ -88,11 +97,19 @@ as needed."
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil))
          (command (grunt--command task))
-         (buf (get-buffer-create
-               (format "*grunt-%s*<%s>" task grunt-current-project)))
+         (buf (grunt--project-task-buffer))
          (default-directory grunt-current-dir))
     (message "%s" command)
     (async-shell-command command buf buf)))
+
+(defun grunt--project-task-buffer ()
+  (let* ((bufname (format "*grunt-%s*<%s>" task grunt-current-project))
+         (buf (get-buffer bufname))
+         (proc (get-buffer-process buf)))
+    (when (and grunt-kill-existing-buffer buf proc)
+      (set-process-query-on-exit-flag proc nil)
+      (kill-buffer bufname))
+    (get-buffer-create bufname)))
 
 (defun grunt-resolve-registered-tasks ()
   "Build a list of potential Grunt tasks

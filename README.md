@@ -27,6 +27,12 @@ tasks, you can also enter in any valid Grunt task at the prompt.
 It'll traverse upwards from your current working directory in search
 of a Gruntfile, or bail out if it can't find one.
 
+If you have a long running task like `serve` or `watch`, you can
+re-run it from `grunt-exec` and we'll automatically kill your existing
+process buffer before starting a new process. This is not the same
+behavior as in previous versions; see <kbd>C-h v</kbd>
+`grunt-kill-existing-buffer` for more information.
+
 ## development
 
 There's clearly tons of room for improvement - in particular, it'd be
