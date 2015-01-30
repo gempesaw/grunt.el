@@ -31,7 +31,9 @@ If you have a long running task like `serve` or `watch`, you can
 re-run it from `grunt-exec` and we'll automatically kill your existing
 process buffer before starting a new process. This is not the same
 behavior as in previous versions; see <kbd>C-h v</kbd>
-`grunt-kill-existing-buffer` for more information.
+`grunt-kill-existing-buffer` for more information. For the old behavior,
+
+    (setq grunt-kill-existing-buffer nil)
 
 ## development
 
