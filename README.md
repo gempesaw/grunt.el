@@ -4,6 +4,8 @@
 a way to invoke grunt tasks without needing a separate shell or buffer
 management per task or project.
 
+![screenshot.png](screenshot.png)
+
 ## installation
 
 Use MELPA: `M-x package-install <RET> grunt <RET>`. Or, get `grunt.el`
@@ -21,8 +23,6 @@ Gruntfile somewhere.
 It'll try to find your Gruntfile and suggest tasks to run if it can
 find them. Although `grunt.el` only knows how to find registered
 tasks, you can also enter in any valid Grunt task at the prompt.
-
-![screenshot.png](screenshot.png)
 
 It'll traverse upwards from your current working directory in search
 of a Gruntfile, or bail out if it can't find one.
