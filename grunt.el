@@ -97,12 +97,16 @@ as needed."
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil))
          (command (grunt--command task))
-         (buf (grunt--project-task-buffer))
-         (default-directory grunt-current-dir))
+         (buf (grunt--project-task-buffer task))
+         (default-directory grunt-current-dir)
+         (ret))
     (message "%s" command)
-    (async-shell-command command buf buf)))
+    (setq ret (async-shell-command command buf buf))
+    ;; handle window sizing: see #6
+    (grunt--set-process-dimensions buf)
+    ret))
 
-(defun grunt--project-task-buffer ()
+(defun grunt--project-task-buffer (task)
   (let* ((bufname (format "*grunt-%s*<%s>" task grunt-current-project))
          (buf (get-buffer bufname))
          (proc (get-buffer-process buf)))
@@ -161,7 +165,12 @@ gruntfile and pulls in the user specified `grunt-options'"
             grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
             grunt-current-path (format "%sGruntfile.js" gruntfile-dir)))))
 
-
+(defun grunt--set-process-dimensions (buf)
+  (let ((process (get-buffer-process buf)))
+    (when process
+      (set-process-window-size process
+                               (window-height)
+                               (window-width)))))
 
 (provide 'grunt)
 ;;; grunt.el ends here

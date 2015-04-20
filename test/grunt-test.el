@@ -115,3 +115,13 @@
      (grunt-exec)
      (grunt-exec)
      (should t))))
+
+(ert-deftest should-set-column-width ()
+  (with-grunt-sandbox
+   (let ((process-resized 0))
+     (noflet ((ido-completing-read (&rest any) "build")
+              (async-shell-command (&rest args) args)
+              (grunt--set-process-dimensions (buf)
+                (setq process-resized (1+ process-resized))))
+       (grunt-exec)
+       (should process-resized)))))
