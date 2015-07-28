@@ -126,7 +126,7 @@ The list is constructed by searching performing the `grunt --help` command,
 or similar, and narrowing down to the Available tasks section before extracting
 the tasks using regexp."
   (with-temp-buffer
-    (insert (grunt-get-help))
+    (insert (grunt--get-help))
     (goto-char 0)
     (let* ((tasks-start (search-forward "Available tasks" nil t))
            (tasks-end (re-search-forward "^$" nil t))
@@ -144,7 +144,7 @@ the tasks using regexp."
               ))))
       result)))
 
-(defun grunt-get-help ()
+(defun grunt--get-help ()
   "Run grunt-help-cmd for the current grunt-project."
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
