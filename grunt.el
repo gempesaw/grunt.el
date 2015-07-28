@@ -122,29 +122,27 @@ as needed."
 (defun grunt-resolve-registered-tasks ()
   "Build a list of potential Grunt tasks.
 
-The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'.  This is incredibly fragile and
-will break on something as simple as an alternate quoting scheme
-or indentation, and it _only_ supports manually registered
-tasks."
+The list is constructed by searching performing the `grunt --help` command,
+or similar, and narrowing down to the Available tasks section before extracting
+the tasks using regexp."
   (with-temp-buffer
-  (insert (grunt-get-help))
-  (goto-char 0)
-  (let* ((tasks-start (search-forward "Available tasks" nil t))
-         (tasks-end (re-search-forward "^$" nil t))
-         (result (list)))
-    (when tasks-start
-      (narrow-to-region tasks-start tasks-end)
-      (goto-char 0)
-      (while (re-search-forward "[\s]+$" nil t)
-        (replace-match ""))
-      (goto-char 0)
-      (while (re-search-forward "^[\s\t]*\\(.*?\\)  " nil t)
-        (let ((match (match-string 1)))
-          (when (string-match "[a-zA-Z]" match)
-            (setq result (append result (list match)))
-            ))))
-    result)))
+    (insert (grunt-get-help))
+    (goto-char 0)
+    (let* ((tasks-start (search-forward "Available tasks" nil t))
+           (tasks-end (re-search-forward "^$" nil t))
+           (result (list)))
+      (when tasks-start
+        (narrow-to-region tasks-start tasks-end)
+        (goto-char 0)
+        (while (re-search-forward "[\s]+$" nil t)
+          (replace-match ""))
+        (goto-char 0)
+        (while (re-search-forward "^[\s\t]*\\(.*?\\)  " nil t)
+          (let ((match (match-string 1)))
+            (when (string-match "[a-zA-Z]" match)
+              (setq result (append result (list match)))
+              ))))
+      result)))
 
 (defun grunt-get-help ()
   "Run grunt-help-cmd for the current grunt-project."
