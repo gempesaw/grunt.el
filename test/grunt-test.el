@@ -17,6 +17,12 @@
 
 (defvar mock-gruntfile-dir "has-gruntfile")
 
+(defun mock-grunt-help ()
+    "Return stub data for the grunt-help command."
+    (with-temp-buffer
+      (insert-file-contents (f-expand "grunt-help.txt" root-test-path))
+      (buffer-string)))
+
 (require 'grunt (f-expand "grunt.el" root-code-path))
 
 (if (not (boundp 'string-suffix-p))
@@ -76,10 +82,9 @@
 
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
-   (f-write "grunt.registerTask('build', ["
-            'utf-8
-            (f-expand "Gruntfile.js" default-directory))
-   (should (string= "build" (car (grunt-resolve-registered-tasks))))))
+   (noflet ((grunt-get-help () (mock-grunt-help)))
+           (should (string= "task" (car (grunt-resolve-registered-tasks))))
+           (should (string= "build" (cadr (grunt-resolve-registered-tasks)))))))
 
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
