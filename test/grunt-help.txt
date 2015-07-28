@@ -33,7 +33,8 @@ be specified inside the Gruntfile wherever possible.
 
 Available tasks
                   task  Description
-                 build  Description
+                 build  Description that goes across two lines,
+                        because this line isn't a task 
 
 Tasks run in the order specified. Arguments may be passed to tasks that accept
 them by using colons, like "lint:files". Tasks marked with * are "multi tasks"
