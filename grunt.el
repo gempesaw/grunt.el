@@ -49,8 +49,13 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
+(defcustom grunt-help-command (format "%s --help --no-color" grunt-base-command)
+  "Command to get the help section from grunt."
+  :type 'string
+  :group 'grunt)
+
 (defcustom grunt-options ""
-  "Additional options to pass to grunt"
+  "Additional options to pass to grunt."
   :type '(string)
   :group 'grunt)
 
@@ -69,21 +74,20 @@ We'll try to find this on our own."
   :group 'grunt)
 
 (defcustom grunt-current-project ""
-  "Name of the current project in which the Gruntfile is found"
+  "Name of the current project in which the Gruntfile is found."
   :type '(string)
   :group 'grunt)
 
 ;;;###autoload
 (defun grunt-exec ()
-  "Invoke this while in your project and it will suggest
-registered tasks.
+  "Invoke this while in your project and it will suggest registered tasks.
 
 You can also manually enter in a specific task that isn't
-registered. It will get/create one buffer per task per project,
+registered.  It will get/create one buffer per task per project,
 as needed."
   (interactive)
   (unless (grunt-locate-gruntfile)
-    (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
+    (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
   (let* ((task (ido-completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil))
@@ -95,25 +99,39 @@ as needed."
     (async-shell-command command buf buf)))
 
 (defun grunt-resolve-registered-tasks ()
-  "Build a list of potential Grunt tasks
+  "Build a list of potential Grunt tasks.
 
 The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'. This is incredibly fragile and
+Gruntfile at `grunt-current-path'.  This is incredibly fragile and
 will break on something as simple as an alternate quoting scheme
 or indentation, and it _only_ supports manually registered
 tasks."
-  (let* ((contents (with-temp-buffer
-                     (insert-file-contents grunt-current-path)
-                     (split-string (buffer-string) "\n"))))
-    (-map (lambda (line)
-            (string-match "[\"']\\\(.*?\\\)[\"\']" line)
-            (match-string 1 line))
-          (-filter (lambda (line)
-                     (string-match-p "registerTask" line))
-                   contents))))
+  (with-temp-buffer
+  (insert (grunt-get-help))
+  (goto-char 0)
+  (let* ((tasks-start (search-forward "Available tasks" nil t))
+         (tasks-end (re-search-forward "^$" nil t))
+         (result (list)))
+    (when tasks-start
+      (narrow-to-region tasks-start tasks-end)
+      (goto-char 0)
+      (while (re-search-forward "[\s]+$" nil t)
+        (replace-match ""))
+      (goto-char 0)
+      (while (re-search-forward "^[\s\t]*\\(.*?\\)  " nil t)
+        (let ((match (match-string 1)))
+          (when (string-match "[a-zA-Z]" match)
+            (setq result (append result (list match)))
+            ))))
+    result)))
+
+(defun grunt-get-help ()
+  "Run grunt-help-cmd for the current grunt-project."
+  (shell-command-to-string
+   (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
 (defun grunt-resolve-options ()
-  "Set up the arguments to the grunt binary
+  "Set up the arguments to the grunt binary.
 
 This lets us invoke grunt properly from any directory with any
 gruntfile and pulls in the user specified `grunt-options'"
@@ -127,13 +145,13 @@ gruntfile and pulls in the user specified `grunt-options'"
           grunt-options))
 
 (defun grunt--command (task)
-  "Return the grunt command for the specified TASK"
+  "Return the grunt command for the specified TASK."
   (unless grunt-base-command
     (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt-locate-gruntfile (&optional directory)
-  "Search the current directory and upwards for a Gruntfile."
+  "Search the current DIRECTORY and upwards for a Gruntfile."
   (let ((gruntfile-dir (locate-dominating-file
                         (if directory
                             directory
