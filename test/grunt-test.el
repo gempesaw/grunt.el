@@ -83,8 +83,10 @@
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
    (noflet ((grunt-get-help () (mock-grunt-help)))
-           (should (string= "task" (car (grunt-resolve-registered-tasks))))
-           (should (string= "build" (cadr (grunt-resolve-registered-tasks)))))))
+           (let ((result (grunt-resolve-registered-tasks)))
+             (should (string= "task" (car result)))
+             (should (string= "build" (cadr result)))
+             (should (eq 2 (length result)))))))
 
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
