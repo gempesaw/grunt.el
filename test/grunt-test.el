@@ -46,6 +46,7 @@
 (defmacro with-grunt-sandbox (&rest body)
   "Evaluate BODY in an empty temporary directory."
   `(let ((default-directory (f-expand mock-gruntfile-dir root-sandbox-path))
+         (grunt-current-tasks-cache nil)
          (grunt-current-path "")
          (grunt-current-dir "")
          (grunt-current-project ""))
@@ -127,3 +128,13 @@
                 (setq process-resized (1+ process-resized))))
        (grunt-exec)
        (should process-resized)))))
+
+(ert-deftest should-not-clear-cache-with-same-gruntfile ()
+  (with-grunt-sandbox
+   (let ((grunt-cache-tasks t)
+         (cleared-cache nil))
+     (noflet ((ido-completing-read (&rest any) "build")
+              (grunt-clear-tasks-cache () (setq cleared-cache t)))
+             (dotimes (i 2) (grunt-exec))
+             (should (not cleared-cache))))))
+             
