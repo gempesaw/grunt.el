@@ -138,3 +138,14 @@
              (dotimes (i 2) (grunt-exec))
              (should (not cleared-cache))))))
              
+(ert-deftest should-clear-cache-when-gruntfile-changes ()
+  (noflet ((ido-completing-read (&rest any) "build")
+           (grunt-clear-tasks-cache () (setq cleared-cache t)))
+     (let ((grunt-cache-tasks t)
+           (cleared-cache nil))
+       (with-grunt-sandbox
+        (grunt-exec))
+       (let ((mock-gruntfile-dir "different-gruntfile"))
+         (with-grunt-sandbox
+          (grunt-exec)
+          (should cleared-cache))))))
