@@ -89,6 +89,20 @@
              (should (string= "build" (cadr result)))
              (should (eq 2 (length result)))))))
 
+(ert-deftest should-resolve-registered-tasks ()
+  (with-grunt-sandbox
+	 (let ((grunt-read-tasks-mode nil))
+		 (f-write "grunt.registerTask('test', ["
+							'utf-8
+							(f-expand "Gruntfile.js" default-directory))
+		 (should (string= "test" (car (grunt-resolve-registered-tasks))))
+
+		 (f-write "grunt.registerTask(\"test2\""
+							'utf-8
+							(f-expand "Gruntfile.js" default-directory))
+		 (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
+
+
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
    (let ((grunt-options "expected-option-string"))
