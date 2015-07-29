@@ -135,27 +135,29 @@ as needed."
 (defun grunt-resolve-registered-tasks ()
   "Build a list of potential Grunt tasks.
 
-The list is constructed by searching performing the `grunt --help` command,
+The list is constructed performing the `grunt --help` command,
 or similar, and narrowing down to the Available tasks section before extracting
 the tasks using regexp."
+  (if (and grunt-cache-tasks grunt-current-tasks-cache)
+      ;; If caching is turned on and a cached value exists
+      grunt-current-tasks-cache
+    (let* ((contents (grunt--get-help-tasks))
+           (result
+            (-non-nil
+             (-map (lambda (line) (when (string-match "^[\s\t]*\\([a-zA-Z:\-]+?\\)  " line)
+                               (match-string 1 line))) contents))))
+      (if grunt-cache-tasks (setq grunt-current-tasks-cache result) result))))
+
+(defun grunt--get-help-tasks ()
+  "Return a list of lines from the tasks region from the `grunt-help-command`."
   (with-temp-buffer
     (insert (grunt--get-help))
     (goto-char 0)
     (let* ((tasks-start (search-forward "Available tasks" nil t))
-           (tasks-end (re-search-forward "^$" nil t))
-           (result (list)))
+           (tasks-end (re-search-forward "^$" nil t)))
       (when tasks-start
         (narrow-to-region tasks-start tasks-end)
-        (goto-char 0)
-        (while (re-search-forward "[\s]+$" nil t)
-          (replace-match ""))
-        (goto-char 0)
-        (while (re-search-forward "^[\s\t]*\\(.*?\\)  " nil t)
-          (let ((match (match-string 1)))
-            (when (string-match "[a-zA-Z]" match)
-              (setq result (append result (list match)))
-              ))))
-      result)))
+        (split-string (buffer-string) "\n")))))
 
 (defun grunt--get-help ()
   "Run grunt-help-cmd for the current grunt-project.
