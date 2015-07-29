@@ -158,7 +158,10 @@ the tasks using regexp."
       result)))
 
 (defun grunt--get-help ()
-  "Run grunt-help-cmd for the current grunt-project."
+  "Run grunt-help-cmd for the current grunt-project.
+
+This function will return the cached version of the command
+if the cache is not empty."
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
