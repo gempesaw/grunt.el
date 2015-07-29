@@ -91,7 +91,10 @@ We'll try to find this on our own."
   "Which tasks you would like to read.
 
 If t it will read all of the tasks, including the ones loaded by grunt modules.
-If nil it will read only the user registered tasks."
+If nil it will read only the user registered tasks.
+
+The default value is t which means that we resolve the tasks using the
+grunt-help-command method."
   :type '(choice
           (const :tag "Read all tasks including ones loaded by grunt modules" t)
           (const :tag "Read only user registered tasks" nil))
