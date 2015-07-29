@@ -43,10 +43,10 @@
   :group 'convenience)
 
 (defcustom grunt-kill-existing-buffer t
-  "Whether or not to kill the existing process buffer
+  "Whether or not to kill the existing process buffer.
 
 Defaults to t. When not nil, we will try to kill the buffer name
-that we construct to do our task. Of course, if you rename your
+that we construct to do our task.  Of course, if you rename your
 buffer, we won't be able to kill it."
   :type 'boolean
   :group 'grunt)
