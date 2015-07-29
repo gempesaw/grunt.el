@@ -108,6 +108,7 @@ registered.  It will get/create one buffer per task per project,
 as needed."
   (interactive)
   (unless (grunt-locate-gruntfile)
+    (grunt-clear-tasks-cache)
     (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
   (let* ((task (ido-completing-read
                 "Execute which task: "
