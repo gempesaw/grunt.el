@@ -87,6 +87,18 @@ We'll try to find this on our own."
   :type '(string)
   :group 'grunt)
 
+(defcustom grunt-cache-tasks nil
+  "Whether or not to cache the taskss until a project change occurs.
+
+If t then running `grunt-exec` will cache the tasks until the Gruntfile.js
+being used changes.  This improves the speed of `grunt-exec` but won't get
+Gruntfile.js changes."
+  :type 'boolean
+  :group 'grunt)
+
+(defvar grunt-current-tasks-cache nil
+  "The cache of current grunt tasks.")
+
 ;;;###autoload
 (defun grunt-exec ()
   "Invoke this while in your project and it will suggest registered tasks.
