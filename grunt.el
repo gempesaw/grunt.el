@@ -87,6 +87,16 @@ We'll try to find this on our own."
   :type '(string)
   :group 'grunt)
 
+(defcustom grunt-read-tasks-mode t
+  "Which tasks you would like to read.
+
+If t it will read all of the tasks, including the ones loaded by grunt modules.
+If nil it will read only the user registered tasks."
+  :type '(choice
+          (const :tag "Read all tasks including ones loaded by grunt modules" t)
+          (const :tag "Read only user registered tasks" nil))
+  :group 'grunt)
+
 (defcustom grunt-cache-tasks nil
   "Whether or not to cache the taskss until a project change occurs.
 
