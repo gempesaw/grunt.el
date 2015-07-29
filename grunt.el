@@ -192,6 +192,10 @@ gruntfile and pulls in the user specified `grunt-options'"
                             directory
                           default-directory) "Gruntfile.js")))
     (when gruntfile-dir
+      (when (and grunt-cache-tasks
+                 (not (string= (file-truename gruntfile-dir) grunt-current-dir)))
+        ;; Caching turned on and different gruntfile - clear cache
+        (grunt-clear-tasks-cache))
       (setq gruntfile-dir (file-truename gruntfile-dir)
             grunt-current-dir gruntfile-dir
             grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
