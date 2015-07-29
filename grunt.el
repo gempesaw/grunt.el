@@ -158,6 +158,25 @@ the tasks using regexp."
                                (match-string 1 line))) contents))))
       (if grunt-cache-tasks (setq grunt-current-tasks-cache result) result))))
 
+(defun grunt--resolve-registered-tasks-from-gruntfile ()
+  "Build a list of potential Grunt tasks from the gruntfile.
+
+The list is constructed by searching for registerTask in the
+Gruntfile at `grunt-current-path'.  This is incredibly fragile and
+will break on something as simple as an alternate quoting scheme
+or indentation, and it _only_ supports manually registered
+tasks."
+  (let* ((contents (with-temp-buffer
+                     (insert-file-contents grunt-current-path)
+                     (split-string (buffer-string) "\n"))))
+    (-map (lambda (line)
+            (string-match "[\"']\\\(.*?\\\)[\"\']" line)
+            (match-string 1 line))
+          (-filter (lambda (line)
+                     (string-match-p "registerTask" line))
+                   contents))))
+
+
 (defun grunt--get-help-tasks ()
   "Return a list of lines from the tasks region from the `grunt-help-command`."
   (with-temp-buffer
