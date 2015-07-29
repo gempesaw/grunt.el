@@ -143,7 +143,17 @@ as needed."
     (get-buffer-create bufname)))
 
 (defun grunt-resolve-registered-tasks ()
-  "Build a list of potential Grunt tasks.
+	"Build a list of Grunt tasks.
+
+Based on the `grunt-read-tasks-mode` it will load all tasks or just the
+user registerdTasks."
+  (if grunt-read-tasks-mode
+			(grunt--resolve-registered-tasks-from-grunthelp)
+		(grunt--resolve-registered-tasks-from-gruntfile))
+  )
+
+(defun grunt--resolve-registered-tasks-from-grunthelp ()
+  "Build a list of potential Grunt tasks from grunt-help-command.
 
 The list is constructed performing the `grunt --help` command,
 or similar, and narrowing down to the Available tasks section before extracting
