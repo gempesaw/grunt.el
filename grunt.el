@@ -193,6 +193,11 @@ gruntfile and pulls in the user specified `grunt-options'"
             grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
             grunt-current-path (format "%sGruntfile.js" gruntfile-dir)))))
 
+(defun grunt-clear-tasks-cache ()
+  "Clear the cache of tasks."
+  (interactive)
+  (setq grunt-current-tasks-cache nil))
+
 (defun grunt--set-process-dimensions (buf)
   (let ((process (get-buffer-process buf)))
     (when process
