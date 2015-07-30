@@ -1,12 +1,12 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
-;; Version: 0.0.3
+;; Version: 1.0.0
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; URL: https://github.com/gempesaw/grunt.el
-;; Package-Requires: ((dash "2.6.0"))
+;; Package-Requires: ((dash "2.9.0"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -16,11 +16,11 @@
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -43,7 +43,7 @@
   :group 'convenience)
 
 (defcustom grunt-kill-existing-buffer t
-  "Whether or not to kill the existing process buffer
+  "Whether or not to kill the existing process buffer.
 
 Defaults to t. When not nil, we will try to kill the buffer name
 that we construct to do our task. Of course, if you rename your
@@ -58,8 +58,13 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
+(defcustom grunt-help-command (format "%s --help --no-color" grunt-base-command)
+  "Command to get the help section from grunt."
+  :type 'string
+  :group 'grunt)
+
 (defcustom grunt-options ""
-  "Additional options to pass to grunt"
+  "Additional options to pass to grunt."
   :type '(string)
   :group 'grunt)
 
@@ -78,21 +83,62 @@ We'll try to find this on our own."
   :group 'grunt)
 
 (defcustom grunt-current-project ""
-  "Name of the current project in which the Gruntfile is found"
+  "Name of the current project in which the Gruntfile is found."
   :type '(string)
   :group 'grunt)
 
-;;;###autoload
-(defun grunt-exec ()
-  "Invoke this while in your project and it will suggest
-registered tasks.
+(defcustom grunt-show-all-tasks t
+  "Which tasks you would like to read.
 
-You can also manually enter in a specific task that isn't
-registered. It will get/create one buffer per task per project,
-as needed."
-  (interactive)
+If t it will suggest all of the tasks, including the ones loaded
+by grunt modules.
+
+If nil it will suggest only the user registered tasks.
+
+The default value is t which means that we resolve the tasks
+using the grunt-help-command method. Since shelling out to run
+`grunt --help` can be slow, we also default to caching the tasks
+for the current project; see `grunt-cache-tasks' for more."
+  :type '(choice
+          (const :tag "Read all tasks including ones loaded by grunt modules" t)
+          (const :tag "Read only user registered tasks" nil))
+  :group 'grunt)
+
+(defcustom grunt-cache-tasks t
+  "Whether or not to cache the tasks until a project change occurs.
+
+If t then running `grunt-exec' will cache the tasks until the
+path to the Gruntfile.js being used changes. That is, when you
+switch projects to one with a different Gruntfile, that's the
+next time we'll invoke `grunt --help`. This improves the speed of
+`grunt-exec', but won't pick up changes to the content of the
+current Gruntfile.js.
+
+To have us suggest new/changed tasks after editing the current
+Gruntfile, you can refresh the cache manually by using a prefix
+argument when invoking `grunt-exec'."
+  :type 'boolean
+  :group 'grunt)
+
+(defvar grunt-current-tasks-cache nil
+  "The cache of current grunt tasks.")
+
+;;;###autoload
+(defun grunt-exec (&optional pfx)
+  "Invoke this while in your project and it will suggest registered tasks.
+
+You can also manually enter in any valid task at the prompt, even
+if it's not suggested. It will get/create one buffer per task
+per project, as needed.
+
+When invoked with a prefix argument, we'll clear the tasks cache
+for you. Note that if `grunt-show-all-tasks' is nil, the
+cache (and the prefix argument functionality of this function) is
+immaterial."
+  (interactive "p")
   (unless (grunt-locate-gruntfile)
     (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
+  (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
   (let* ((task (ido-completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil))
@@ -116,13 +162,40 @@ as needed."
     (get-buffer-create bufname)))
 
 (defun grunt-resolve-registered-tasks ()
-  "Build a list of potential Grunt tasks
+  "Build a list of Grunt tasks.
+
+Based on the `grunt-show-all-tasks' it will load all tasks or
+just the user registerdTasks."
+  (if grunt-show-all-tasks
+      (grunt--resolve-registered-tasks-from-grunthelp)
+    (grunt--resolve-registered-tasks-from-gruntfile)))
+
+(defun grunt--resolve-registered-tasks-from-grunthelp ()
+  "Build a list of potential Grunt tasks from grunt-help-command.
+
+The list is constructed performing the `grunt --help` command, or
+similar, and narrowing down to the Available tasks section before
+extracting the tasks using regexp."
+  (if (and grunt-cache-tasks grunt-current-tasks-cache)
+      ;; If caching is turned on and a cached value exists
+      grunt-current-tasks-cache
+    (let* ((contents (grunt--get-help-tasks))
+           (result
+            (-non-nil
+             (-map (lambda (line) (when (string-match "^[\s\t]*\\([a-zA-Z:\-]+?\\)  " line)
+                               (match-string 1 line))) contents))))
+      (if grunt-cache-tasks (setq grunt-current-tasks-cache result) result))))
+
+(defun grunt--resolve-registered-tasks-from-gruntfile ()
+  "Build a list of potential Grunt tasks from the gruntfile.
 
 The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'. This is incredibly fragile and
-will break on something as simple as an alternate quoting scheme
-or indentation, and it _only_ supports manually registered
-tasks."
+Gruntfile at `grunt-current-path'. This is incredibly fragile
+and will break on something as simple as an alternate quoting
+scheme or indentation, and it _only_ supports manually registered
+tasks.
+
+To suggest all valid tasks, see `grunt-show-all-tasks'."
   (let* ((contents (with-temp-buffer
                      (insert-file-contents grunt-current-path)
                      (split-string (buffer-string) "\n"))))
@@ -133,8 +206,28 @@ tasks."
                      (string-match-p "registerTask" line))
                    contents))))
 
+(defun grunt--get-help-tasks ()
+  "Return a list of lines from the tasks region from the `grunt-help-command'."
+  (with-temp-buffer
+    (insert (grunt--get-help))
+    (goto-char 0)
+    (let* ((tasks-start (search-forward "Available tasks" nil t))
+           (tasks-end (re-search-forward "^$" nil t)))
+      (when tasks-start
+        (narrow-to-region tasks-start tasks-end)
+        (split-string (buffer-string) "\n")))))
+
+(defun grunt--get-help ()
+  "Run grunt-help-cmd for the current grunt-project.
+
+This function will return the cached version of the command if
+the cache is not empty."
+  (message "Building task list from grunt --help, one moment...")
+  (shell-command-to-string
+   (format "cd %s; %s" grunt-current-dir grunt-help-command)))
+
 (defun grunt-resolve-options ()
-  "Set up the arguments to the grunt binary
+  "Set up the arguments to the grunt binary.
 
 This lets us invoke grunt properly from any directory with any
 gruntfile and pulls in the user specified `grunt-options'"
@@ -148,22 +241,31 @@ gruntfile and pulls in the user specified `grunt-options'"
           grunt-options))
 
 (defun grunt--command (task)
-  "Return the grunt command for the specified TASK"
+  "Return the grunt command for the specified TASK."
   (unless grunt-base-command
     (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt-locate-gruntfile (&optional directory)
-  "Search the current directory and upwards for a Gruntfile."
+  "Search the current DIRECTORY and upwards for a Gruntfile."
   (let ((gruntfile-dir (locate-dominating-file
                         (if directory
                             directory
                           default-directory) "Gruntfile.js")))
     (when gruntfile-dir
+      (when (and grunt-cache-tasks
+                 (not (string= (file-truename gruntfile-dir) grunt-current-dir)))
+        ;; Caching turned on and different gruntfile - clear cache
+        (grunt-clear-tasks-cache))
       (setq gruntfile-dir (file-truename gruntfile-dir)
             grunt-current-dir gruntfile-dir
             grunt-current-project (car (last (split-string gruntfile-dir "/" t)))
             grunt-current-path (format "%sGruntfile.js" gruntfile-dir)))))
+
+(defun grunt-clear-tasks-cache ()
+  "Clear the cache of tasks."
+  (interactive)
+  (setq grunt-current-tasks-cache nil))
 
 (defun grunt--set-process-dimensions (buf)
   (let ((process (get-buffer-process buf)))
