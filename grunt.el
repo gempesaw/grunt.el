@@ -146,21 +146,20 @@ as needed."
     (get-buffer-create bufname)))
 
 (defun grunt-resolve-registered-tasks ()
-	"Build a list of Grunt tasks.
+  "Build a list of Grunt tasks.
 
-Based on the `grunt-read-tasks-mode` it will load all tasks or just the
-user registerdTasks."
+Based on the `grunt-read-tasks-mode` it will load all tasks or
+just the user registerdTasks."
   (if grunt-read-tasks-mode
-			(grunt--resolve-registered-tasks-from-grunthelp)
-		(grunt--resolve-registered-tasks-from-gruntfile))
-  )
+      (grunt--resolve-registered-tasks-from-grunthelp)
+    (grunt--resolve-registered-tasks-from-gruntfile)))
 
 (defun grunt--resolve-registered-tasks-from-grunthelp ()
   "Build a list of potential Grunt tasks from grunt-help-command.
 
-The list is constructed performing the `grunt --help` command,
-or similar, and narrowing down to the Available tasks section before extracting
-the tasks using regexp."
+The list is constructed performing the `grunt --help` command, or
+similar, and narrowing down to the Available tasks section before
+extracting the tasks using regexp."
   (if (and grunt-cache-tasks grunt-current-tasks-cache)
       ;; If caching is turned on and a cached value exists
       grunt-current-tasks-cache
@@ -175,9 +174,9 @@ the tasks using regexp."
   "Build a list of potential Grunt tasks from the gruntfile.
 
 The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'.  This is incredibly fragile and
-will break on something as simple as an alternate quoting scheme
-or indentation, and it _only_ supports manually registered
+Gruntfile at `grunt-current-path'.  This is incredibly fragile
+and will break on something as simple as an alternate quoting
+scheme or indentation, and it _only_ supports manually registered
 tasks."
   (let* ((contents (with-temp-buffer
                      (insert-file-contents grunt-current-path)
@@ -188,7 +187,6 @@ tasks."
           (-filter (lambda (line)
                      (string-match-p "registerTask" line))
                    contents))))
-
 
 (defun grunt--get-help-tasks ()
   "Return a list of lines from the tasks region from the `grunt-help-command`."
@@ -204,8 +202,8 @@ tasks."
 (defun grunt--get-help ()
   "Run grunt-help-cmd for the current grunt-project.
 
-This function will return the cached version of the command
-if the cache is not empty."
+This function will return the cached version of the command if
+the cache is not empty."
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
