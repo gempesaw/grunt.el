@@ -18,10 +18,10 @@
 (defvar mock-gruntfile-dir "has-gruntfile")
 
 (defun mock-grunt-help ()
-    "Return stub data for the grunt-help command."
-    (with-temp-buffer
-      (insert-file-contents (f-expand "grunt-help.txt" root-test-path))
-      (buffer-string)))
+  "Return stub data for the grunt-help command."
+  (with-temp-buffer
+    (insert-file-contents (f-expand "grunt-help.txt" root-test-path))
+    (buffer-string)))
 
 (require 'grunt (f-expand "grunt.el" root-code-path))
 
@@ -84,23 +84,23 @@
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
    (noflet ((grunt--get-help () (mock-grunt-help)))
-           (let ((result (grunt-resolve-registered-tasks)))
-             (should (string= "task" (car result)))
-             (should (string= "build" (cadr result)))
-             (should (eq 2 (length result)))))))
+     (let ((result (grunt-resolve-registered-tasks)))
+       (should (string= "task" (car result)))
+       (should (string= "build" (cadr result)))
+       (should (eq 2 (length result)))))))
 
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
-         (let ((grunt-read-tasks-mode nil))
-                 (f-write "grunt.registerTask('test', ["
-                                                        'utf-8
-                                                        (f-expand "Gruntfile.js" default-directory))
-                 (should (string= "test" (car (grunt-resolve-registered-tasks))))
+   (let ((grunt-read-tasks-mode nil))
+     (f-write "grunt.registerTask('test', ["
+              'utf-8
+              (f-expand "Gruntfile.js" default-directory))
+     (should (string= "test" (car (grunt-resolve-registered-tasks))))
 
-                 (f-write "grunt.registerTask(\"test2\""
-                                                        'utf-8
-                                                        (f-expand "Gruntfile.js" default-directory))
-                 (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
+     (f-write "grunt.registerTask(\"test2\""
+              'utf-8
+              (f-expand "Gruntfile.js" default-directory))
+     (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
 
 
 (ert-deftest should-include-custom-options ()
@@ -139,7 +139,7 @@
      (noflet ((ido-completing-read (&rest any) "build")
               (async-shell-command (&rest args) args)
               (grunt--set-process-dimensions (buf)
-                (setq process-resized (1+ process-resized))))
+                                             (setq process-resized (1+ process-resized))))
        (grunt-exec)
        (should process-resized)))))
 
@@ -149,32 +149,32 @@
          (cleared-cache nil))
      (noflet ((ido-completing-read (&rest any) "build")
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
-             (dotimes (i 2) (grunt-exec))
-             (should (not cleared-cache))))))
+       (dotimes (i 2) (grunt-exec))
+       (should (not cleared-cache))))))
 
 (ert-deftest should-not-clear-cache-when-caching-disabled ()
   (noflet ((ido-completing-read (&rest any) "build")
            (grunt-clear-tasks-cache () (setq cleared-cache t)))
-     (let ((grunt-cache-tasks nil)
-           (cleared-cache nil))
-       (with-grunt-sandbox
-        (grunt-exec))
-       (let ((mock-gruntfile-dir "different-gruntfile"))
-         (with-grunt-sandbox
-          (grunt-exec)
-          (should (not cleared-cache)))))))
+    (let ((grunt-cache-tasks nil)
+          (cleared-cache nil))
+      (with-grunt-sandbox
+       (grunt-exec))
+      (let ((mock-gruntfile-dir "different-gruntfile"))
+        (with-grunt-sandbox
+         (grunt-exec)
+         (should (not cleared-cache)))))))
 
 (ert-deftest should-clear-cache-when-gruntfile-changes ()
   (noflet ((ido-completing-read (&rest any) "build")
            (grunt-clear-tasks-cache () (setq cleared-cache t)))
-     (let ((grunt-cache-tasks t)
-           (cleared-cache nil))
-       (with-grunt-sandbox
-        (grunt-exec))
-       (let ((mock-gruntfile-dir "different-gruntfile"))
-         (with-grunt-sandbox
-          (grunt-exec)
-          (should cleared-cache))))))
+    (let ((grunt-cache-tasks t)
+          (cleared-cache nil))
+      (with-grunt-sandbox
+       (grunt-exec))
+      (let ((mock-gruntfile-dir "different-gruntfile"))
+        (with-grunt-sandbox
+         (grunt-exec)
+         (should cleared-cache))))))
 
 (ert-deftest should-clear-cache-on-prefix-arg ()
   (with-grunt-sandbox
