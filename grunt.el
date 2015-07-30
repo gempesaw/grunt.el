@@ -16,11 +16,11 @@
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -46,7 +46,7 @@
   "Whether or not to kill the existing process buffer.
 
 Defaults to t. When not nil, we will try to kill the buffer name
-that we construct to do our task.  Of course, if you rename your
+that we construct to do our task. Of course, if you rename your
 buffer, we won't be able to kill it."
   :type 'boolean
   :group 'grunt)
@@ -117,7 +117,7 @@ Gruntfile.js changes."
   "Invoke this while in your project and it will suggest registered tasks.
 
 You can also manually enter in any valid task at the prompt, even
-if it's not suggested.  It will get/create one buffer per task
+if it's not suggested. It will get/create one buffer per task
 per project, as needed.
 
 When invoked with a prefix argument, we'll clear the tasks cache
