@@ -4,6 +4,8 @@
 a way to invoke grunt tasks without needing a separate shell or buffer
 management per task or project.
 
+[![Build Status](https://travis-ci.org/gempesaw/grunt.el.svg?branch=master)](https://travis-ci.org/gempesaw/grunt.el)
+
 ![screenshot.png](screenshot.png)
 
 ## installation
