@@ -1,10 +1,8 @@
-# grunt.el
+# grunt.el [![Build Status](https://travis-ci.org/gempesaw/grunt.el.svg?branch=master)](https://travis-ci.org/gempesaw/grunt.el) [![MELPA](http://melpa.org/packages/grunt-badge.svg)](http://melpa.org/#/grunt) [![MELPA Stable](http://stable.melpa.org/packages/grunt-badge.svg)](http://stable.melpa.org/#/grunt)
 
 [Grunt][] is a renowned JavaScript task runner. This package provides
 a way to invoke grunt tasks without needing a separate shell or buffer
 management per task or project.
-
-[![Build Status](https://travis-ci.org/gempesaw/grunt.el.svg?branch=master)](https://travis-ci.org/gempesaw/grunt.el)
 
 ![screenshot.png](screenshot.png)
 
