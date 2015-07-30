@@ -91,16 +91,16 @@
 
 (ert-deftest should-resolve-registered-tasks ()
   (with-grunt-sandbox
-	 (let ((grunt-read-tasks-mode nil))
-		 (f-write "grunt.registerTask('test', ["
-							'utf-8
-							(f-expand "Gruntfile.js" default-directory))
-		 (should (string= "test" (car (grunt-resolve-registered-tasks))))
+         (let ((grunt-read-tasks-mode nil))
+                 (f-write "grunt.registerTask('test', ["
+                                                        'utf-8
+                                                        (f-expand "Gruntfile.js" default-directory))
+                 (should (string= "test" (car (grunt-resolve-registered-tasks))))
 
-		 (f-write "grunt.registerTask(\"test2\""
-							'utf-8
-							(f-expand "Gruntfile.js" default-directory))
-		 (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
+                 (f-write "grunt.registerTask(\"test2\""
+                                                        'utf-8
+                                                        (f-expand "Gruntfile.js" default-directory))
+                 (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
 
 
 (ert-deftest should-include-custom-options ()
@@ -121,8 +121,8 @@
    (noflet ((ido-completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
      (let* ((args (grunt-exec))
-           (cmd (car args))
-           (buf (buffer-name (cadr args))))
+            (cmd (car args))
+            (buf (buffer-name (cadr args))))
        (should (string-suffix-p "build" cmd))
        (should (string= "*grunt-build*<has-gruntfile>" buf))))))
 
@@ -176,3 +176,11 @@
           (grunt-exec)
           (should cleared-cache))))))
 
+(ert-deftest should-clear-cache-on-prefix-arg ()
+  (with-grunt-sandbox
+   (let ((cleared-cache nil))
+     (noflet ((ido-completing-read (&rest any) "build")
+              (async-shell-command (&rest args) args)
+              (grunt-clear-tasks-cache () (setq cleared-cache t)))
+       (grunt-exec 4)
+       (should cleared-cache)))))

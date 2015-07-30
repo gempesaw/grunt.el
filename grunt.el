@@ -113,16 +113,22 @@ Gruntfile.js changes."
   "The cache of current grunt tasks.")
 
 ;;;###autoload
-(defun grunt-exec ()
+(defun grunt-exec (&optional pfx)
   "Invoke this while in your project and it will suggest registered tasks.
 
-You can also manually enter in a specific task that isn't
-registered.  It will get/create one buffer per task per project,
-as needed."
-  (interactive)
+You can also manually enter in any valid task at the prompt, even
+if it's not suggested.  It will get/create one buffer per task
+per project, as needed.
+
+When invoked with a prefix argument, we'll clear the tasks cache
+for you. Note that if `grunt-read-tasks-mode' is nil, the
+cache (and the prefix argument functionality of this function) is
+immaterial."
+  (interactive "p")
   (unless (grunt-locate-gruntfile)
     (grunt-clear-tasks-cache)
-    (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
+    (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
+  (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
   (let* ((task (ido-completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil))
