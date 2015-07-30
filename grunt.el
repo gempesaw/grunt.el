@@ -137,7 +137,6 @@ cache (and the prefix argument functionality of this function) is
 immaterial."
   (interactive "p")
   (unless (grunt-locate-gruntfile)
-    (grunt-clear-tasks-cache)
     (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
   (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
   (let* ((task (ido-completing-read

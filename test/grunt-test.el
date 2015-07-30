@@ -81,7 +81,7 @@
   (with-grunt-sandbox
    (should (string= mock-gruntfile-dir grunt-current-project))))
 
-(ert-deftest should-resolve-registered-tasks ()
+(ert-deftest should-resolve-registered-tasks-via-shell ()
   (with-grunt-sandbox
    (noflet ((grunt--get-help () (mock-grunt-help)))
      (let ((result (grunt-resolve-registered-tasks)))
@@ -89,9 +89,9 @@
        (should (string= "build" (cadr result)))
        (should (eq 2 (length result)))))))
 
-(ert-deftest should-resolve-registered-tasks ()
+(ert-deftest should-resolve-registered-tasks-via-regex ()
   (with-grunt-sandbox
-   (let ((grunt-read-tasks-mode nil))
+   (let ((grunt-show-all-tasks nil))
      (f-write "grunt.registerTask('test', ["
               'utf-8
               (f-expand "Gruntfile.js" default-directory))
