@@ -87,7 +87,7 @@ We'll try to find this on our own."
   :type '(string)
   :group 'grunt)
 
-(defcustom grunt-read-tasks-mode t
+(defcustom grunt-show-all-tasks t
   "Which tasks you would like to read.
 
 If t it will suggest all of the tasks, including the ones loaded
@@ -132,7 +132,7 @@ if it's not suggested. It will get/create one buffer per task
 per project, as needed.
 
 When invoked with a prefix argument, we'll clear the tasks cache
-for you. Note that if `grunt-read-tasks-mode' is nil, the
+for you. Note that if `grunt-show-all-tasks' is nil, the
 cache (and the prefix argument functionality of this function) is
 immaterial."
   (interactive "p")
@@ -165,9 +165,9 @@ immaterial."
 (defun grunt-resolve-registered-tasks ()
   "Build a list of Grunt tasks.
 
-Based on the `grunt-read-tasks-mode' it will load all tasks or
+Based on the `grunt-show-all-tasks' it will load all tasks or
 just the user registerdTasks."
-  (if grunt-read-tasks-mode
+  (if grunt-show-all-tasks
       (grunt--resolve-registered-tasks-from-grunthelp)
     (grunt--resolve-registered-tasks-from-gruntfile)))
 
@@ -196,7 +196,7 @@ and will break on something as simple as an alternate quoting
 scheme or indentation, and it _only_ supports manually registered
 tasks.
 
-To suggest all valid tasks, see `grunt-read-tasks-mode'."
+To suggest all valid tasks, see `grunt-show-all-tasks'."
   (let* ((contents (with-temp-buffer
                      (insert-file-contents grunt-current-path)
                      (split-string (buffer-string) "\n"))))
