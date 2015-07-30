@@ -210,6 +210,7 @@ tasks."
 
 This function will return the cached version of the command if
 the cache is not empty."
+  (message "Building task list from grunt --help, one moment...")
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
