@@ -101,7 +101,7 @@ grunt-help-command method."
   :group 'grunt)
 
 (defcustom grunt-cache-tasks nil
-  "Whether or not to cache the taskss until a project change occurs.
+  "Whether or not to cache the tasks until a project change occurs.
 
 If t then running `grunt-exec` will cache the tasks until the Gruntfile.js
 being used changes.  This improves the speed of `grunt-exec` but won't get
