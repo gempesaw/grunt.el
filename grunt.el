@@ -154,7 +154,7 @@ immaterial."
 (defun grunt-resolve-registered-tasks ()
   "Build a list of Grunt tasks.
 
-Based on the `grunt-read-tasks-mode` it will load all tasks or
+Based on the `grunt-read-tasks-mode' it will load all tasks or
 just the user registerdTasks."
   (if grunt-read-tasks-mode
       (grunt--resolve-registered-tasks-from-grunthelp)
@@ -180,7 +180,7 @@ extracting the tasks using regexp."
   "Build a list of potential Grunt tasks from the gruntfile.
 
 The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'.  This is incredibly fragile
+Gruntfile at `grunt-current-path'. This is incredibly fragile
 and will break on something as simple as an alternate quoting
 scheme or indentation, and it _only_ supports manually registered
 tasks."
@@ -195,7 +195,7 @@ tasks."
                    contents))))
 
 (defun grunt--get-help-tasks ()
-  "Return a list of lines from the tasks region from the `grunt-help-command`."
+  "Return a list of lines from the tasks region from the `grunt-help-command'."
   (with-temp-buffer
     (insert (grunt--get-help))
     (goto-char 0)
