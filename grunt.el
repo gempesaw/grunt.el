@@ -90,22 +90,33 @@ We'll try to find this on our own."
 (defcustom grunt-read-tasks-mode t
   "Which tasks you would like to read.
 
-If t it will read all of the tasks, including the ones loaded by grunt modules.
-If nil it will read only the user registered tasks.
+If t it will suggest all of the tasks, including the ones loaded
+by grunt modules.
 
-The default value is t which means that we resolve the tasks using the
-grunt-help-command method."
+If nil it will suggest only the user registered tasks.
+
+The default value is t which means that we resolve the tasks
+using the grunt-help-command method. Since shelling out to run
+`grunt --help` can be slow, we also default to caching the tasks
+for the current project; see `grunt-cache-tasks' for more."
   :type '(choice
           (const :tag "Read all tasks including ones loaded by grunt modules" t)
           (const :tag "Read only user registered tasks" nil))
   :group 'grunt)
 
-(defcustom grunt-cache-tasks nil
+(defcustom grunt-cache-tasks t
   "Whether or not to cache the tasks until a project change occurs.
 
-If t then running `grunt-exec` will cache the tasks until the Gruntfile.js
-being used changes.  This improves the speed of `grunt-exec` but won't get
-Gruntfile.js changes."
+If t then running `grunt-exec' will cache the tasks until the
+path to the Gruntfile.js being used changes. That is, when you
+switch projects to one with a different Gruntfile, that's the
+next time we'll invoke `grunt --help`. This improves the speed of
+`grunt-exec', but won't pick up changes to the content of the
+current Gruntfile.js.
+
+To have us suggest new/changed tasks after editing the current
+Gruntfile, you can refresh the cache manually by using a prefix
+argument when invoking `grunt-exec'."
   :type 'boolean
   :group 'grunt)
 
@@ -183,7 +194,9 @@ The list is constructed by searching for registerTask in the
 Gruntfile at `grunt-current-path'. This is incredibly fragile
 and will break on something as simple as an alternate quoting
 scheme or indentation, and it _only_ supports manually registered
-tasks."
+tasks.
+
+To suggest all valid tasks, see `grunt-read-tasks-mode'."
   (let* ((contents (with-temp-buffer
                      (insert-file-contents grunt-current-path)
                      (split-string (buffer-string) "\n"))))
