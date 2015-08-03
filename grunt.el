@@ -292,7 +292,7 @@ gruntfile and pulls in the user specified `grunt-options'"
 This means making it read only and locally binding the 'q' key to quit."
   (with-current-buffer buf
     (read-only-mode)
-    (local-set-key (kbd "q") '(lambda () (interactive) (progn (delete-window) (kill-buffer (buffer-name)))))))
+    (local-set-key (kbd "q") '(lambda () (interactive) (quit-window)))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
