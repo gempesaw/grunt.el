@@ -63,7 +63,7 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
-(defcustom grunt-verbose nil
+(defcustom grunt-verbose t
   "Whether to be verbose with messaging."
   :type '(boolean)
   :group 'grunt)
