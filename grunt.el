@@ -252,7 +252,7 @@ gruntfile and pulls in the user specified `grunt-options'"
     (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
-(defun grunt--mesage (s)
+(defun grunt--message (s)
   "Print a string message S if in verbose mode."
   (when grunt-verbose (message s)))
 
