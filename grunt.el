@@ -63,6 +63,11 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
+(defcustom grunt-verbose nil
+  "Whether to be verbose with messaging."
+  :type '(boolean)
+  :group 'grunt)
+
 (defcustom grunt-options ""
   "Additional options to pass to grunt."
   :type '(string)
@@ -146,7 +151,7 @@ immaterial."
          (buf (grunt--project-task-buffer task))
          (default-directory grunt-current-dir)
          (ret))
-    (message "%s" command)
+    (grunt--message (format "%s" command))
     (setq ret (async-shell-command command buf buf))
     ;; handle window sizing: see #6
     (grunt--set-process-dimensions buf)
@@ -223,7 +228,7 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
 
 This function will return the cached version of the command if
 the cache is not empty."
-  (message "Building task list from grunt --help, one moment...")
+  (grunt--message "Building task list from grunt --help, one moment...")
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
@@ -246,6 +251,10 @@ gruntfile and pulls in the user specified `grunt-options'"
   (unless grunt-base-command
     (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
+
+(defun grunt--mesage (s)
+  "Print a string message S if in verbose mode."
+  (when grunt-verbose (message s)))
 
 (defun grunt-locate-gruntfile (&optional directory)
   "Search the current DIRECTORY and upwards for a Gruntfile."
