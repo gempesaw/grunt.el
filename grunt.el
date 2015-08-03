@@ -155,6 +155,7 @@ immaterial."
     (setq ret (async-shell-command command buf buf))
     ;; handle window sizing: see #6
     (grunt--set-process-dimensions buf)
+    (grunt--set-process-read-only buf)
     ret))
 
 (defun grunt--project-task-buffer (task)
@@ -284,6 +285,13 @@ gruntfile and pulls in the user specified `grunt-options'"
       (set-process-window-size process
                                (window-height)
                                (window-width)))))
+
+(defun grunt--set-process-read-only (buf)
+  "Set the buffer BUF to behave like a compilation buffer.
+
+This means making it read only and locally binding the 'q' key to quit."
+  (with-current-buffer buf
+    (read-only-mode)))
 
 (provide 'grunt)
 ;;; grunt.el ends here
