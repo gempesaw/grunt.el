@@ -46,7 +46,7 @@
   "Whether or not to kill the existing process buffer.
 
 Defaults to t. When not nil, we will try to kill the buffer name
-that we construct to do our task. Of course, if you rename your
+that we construct to do our task.  Of course, if you rename your
 buffer, we won't be able to kill it."
   :type 'boolean
   :group 'grunt)
@@ -61,6 +61,11 @@ You may have to fix this if `grunt' isn't in your PATH."
 (defcustom grunt-help-command (format "%s --help --no-color" grunt-base-command)
   "Command to get the help section from grunt."
   :type 'string
+  :group 'grunt)
+
+(defcustom grunt-verbose t
+  "Whether to be verbose with messaging."
+  :type '(boolean)
   :group 'grunt)
 
 (defcustom grunt-options ""
@@ -96,7 +101,7 @@ by grunt modules.
 If nil it will suggest only the user registered tasks.
 
 The default value is t which means that we resolve the tasks
-using the grunt-help-command method. Since shelling out to run
+using the grunt-help-command method.  Since shelling out to run
 `grunt --help` can be slow, we also default to caching the tasks
 for the current project; see `grunt-cache-tasks' for more."
   :type '(choice
@@ -108,9 +113,9 @@ for the current project; see `grunt-cache-tasks' for more."
   "Whether or not to cache the tasks until a project change occurs.
 
 If t then running `grunt-exec' will cache the tasks until the
-path to the Gruntfile.js being used changes. That is, when you
+path to the Gruntfile.js being used changes.  That is, when you
 switch projects to one with a different Gruntfile, that's the
-next time we'll invoke `grunt --help`. This improves the speed of
+next time we'll invoke `grunt --help`.  This improves the speed of
 `grunt-exec', but won't pick up changes to the content of the
 current Gruntfile.js.
 
@@ -125,19 +130,19 @@ argument when invoking `grunt-exec'."
 
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
-  "Invoke this while in your project and it will suggest registered tasks.
+  "Run tasks from gruntfile.  Calling with PFX will clear the cache of tasks.
 
 You can also manually enter in any valid task at the prompt, even
-if it's not suggested. It will get/create one buffer per task
+if it's not suggested.  It will get/create one buffer per task
 per project, as needed.
 
 When invoked with a prefix argument, we'll clear the tasks cache
-for you. Note that if `grunt-show-all-tasks' is nil, the
+for you.  Note that if `grunt-show-all-tasks' is nil, the
 cache (and the prefix argument functionality of this function) is
 immaterial."
   (interactive "p")
   (unless (grunt-locate-gruntfile)
-    (error "Sorry, we couldn't find a gruntfile. Consider setting `grunt-current-path' manually?"))
+    (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
   (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
   (let* ((task (ido-completing-read
                 "Execute which task: "
@@ -146,13 +151,15 @@ immaterial."
          (buf (grunt--project-task-buffer task))
          (default-directory grunt-current-dir)
          (ret))
-    (message "%s" command)
+    (grunt--message (format "%s" command))
     (setq ret (async-shell-command command buf buf))
     ;; handle window sizing: see #6
     (grunt--set-process-dimensions buf)
+    (grunt--set-process-read-only buf)
     ret))
 
 (defun grunt--project-task-buffer (task)
+  "Create a process buffer for the grunt TASK."
   (let* ((bufname (format "*grunt-%s*<%s>" task grunt-current-project))
          (buf (get-buffer bufname))
          (proc (get-buffer-process buf)))
@@ -190,7 +197,7 @@ extracting the tasks using regexp."
   "Build a list of potential Grunt tasks from the gruntfile.
 
 The list is constructed by searching for registerTask in the
-Gruntfile at `grunt-current-path'. This is incredibly fragile
+Gruntfile at `grunt-current-path'.  This is incredibly fragile
 and will break on something as simple as an alternate quoting
 scheme or indentation, and it _only_ supports manually registered
 tasks.
@@ -222,7 +229,7 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
 
 This function will return the cached version of the command if
 the cache is not empty."
-  (message "Building task list from grunt --help, one moment...")
+  (grunt--message "Building task list from grunt --help, one moment...")
   (shell-command-to-string
    (format "cd %s; %s" grunt-current-dir grunt-help-command)))
 
@@ -246,6 +253,10 @@ gruntfile and pulls in the user specified `grunt-options'"
     (setq grunt-base-command (executable-find "grunt")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
+(defun grunt--message (s)
+  "Print a string message S if in verbose mode."
+  (when grunt-verbose (message s)))
+
 (defun grunt-locate-gruntfile (&optional directory)
   "Search the current DIRECTORY and upwards for a Gruntfile."
   (let ((gruntfile-dir (locate-dominating-file
@@ -268,11 +279,20 @@ gruntfile and pulls in the user specified `grunt-options'"
   (setq grunt-current-tasks-cache nil))
 
 (defun grunt--set-process-dimensions (buf)
+  "Set the dimensions of the process buffer BUF."
   (let ((process (get-buffer-process buf)))
     (when process
       (set-process-window-size process
                                (window-height)
                                (window-width)))))
+
+(defun grunt--set-process-read-only (buf)
+  "Set the buffer BUF to behave like a compilation buffer.
+
+This means making it read only and locally binding the 'q' key to quit."
+  (with-current-buffer buf
+    (read-only-mode)
+    (local-set-key (kbd "q") '(lambda () (interactive) (quit-window)))))
 
 (provide 'grunt)
 ;;; grunt.el ends here

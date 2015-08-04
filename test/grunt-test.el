@@ -49,7 +49,8 @@
          (grunt-current-tasks-cache nil)
          (grunt-current-path "")
          (grunt-current-dir "")
-         (grunt-current-project ""))
+         (grunt-current-project "")
+         (grunt-verbose nil))
      (when (f-dir? root-sandbox-path)
        (f-delete root-sandbox-path :force))
      (f-mkdir root-sandbox-path default-directory)
@@ -142,6 +143,14 @@
                                              (setq process-resized (1+ process-resized))))
        (grunt-exec)
        (should process-resized)))))
+
+(ert-deftest should-set-process-to-read-only ()
+  (with-grunt-sandbox
+   (noflet ((ido-completing-read (&rest any) "build")
+            (async-shell-command (&rest args) args))
+           (grunt-exec)
+           (set-buffer "*grunt-build*<has-gruntfile>")
+           (should buffer-read-only))))
 
 (ert-deftest should-not-clear-cache-with-same-gruntfile ()
   (with-grunt-sandbox
