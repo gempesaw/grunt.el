@@ -229,9 +229,33 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
 
 This function will return the cached version of the command if
 the cache is not empty."
-  (grunt--message "Building task list from grunt --help, one moment...")
-  (shell-command-to-string
-   (format "cd %s; %s" grunt-current-dir grunt-help-command)))
+  (let* ((default-directory "/Users/dgempesaw/opt/dev_hdew/honeydew-ui/ng/")
+         (process-name "grunt-help-process")
+         (command (s-split " " grunt-help-command))
+         (args (-concat `(,process-name nil) command))
+         (progress-reporter
+          (make-progress-reporter
+           (format "Building task list via %S, one moment..." grunt-help-command)))
+         (proc))
+    (setq grunt--help-string ""
+          grunt--help-command-done nil)
+    (setq proc (apply 'start-process args))
+    (set-process-filter proc 'grunt--process-filter)
+    (set-process-sentinel proc 'grunt--help-process-sentinel)
+    (while (not grunt--help-command-done)
+      (progress-reporter-update progress-reporter)
+      (accept-process-output proc 0.5))
+    (sit-for 1)
+    (progress-reporter-done progress-reporter)
+    grunt--help-string))
+
+(defun grunt--help-process-filter (proc output)
+  (setq grunt--help-string
+        (concat grunt--help-string output)))
+
+(defun grunt--help-process-sentinel (proc event)
+  (when event
+    (setq grunt--help-command-done t)))
 
 (defun grunt-resolve-options ()
   "Set up the arguments to the grunt binary.
