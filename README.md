@@ -32,10 +32,21 @@ You can also enter in any valid Grunt task at the prompt.
 
 ### breaking changes
 
+- **v1.1.0**: If you happened to install this specific 1.1.0 version
+  during the short period it was available, we may have accidentally
+  overriden your <kbd>q</kbd> key in all shells to
+  `(quit-window)`. This is obviously undesirable; execute the
+  following elisp when in a shell via <kbd>C-x C-e</kbd> or
+  <kbd>M-:</kbd> to restore functionality. Sorry 'bout that one!
+
+  ```elisp
+  (local-set-key (kbd "q") 'self-insert-command)
+  ```
+
 - **v1.0.0**: We now default to using `grunt --help` to establish our
   task list. This is _not_ the same behavior as in previous versions;
-  see `grunt-show-all-tasks` for more information. For the old
-  behavior,
+  see <kbd>C-h v</kbd> `grunt-show-all-tasks` for more
+  information. For the old behavior,
 
   ```elisp
   (setq grunt-show-all-tasks nil)
