@@ -128,6 +128,9 @@ argument when invoking `grunt-exec'."
 (defvar grunt-current-tasks-cache nil
   "The cache of current grunt tasks.")
 
+(defvar grunt-previous-run nil
+	"Previous task that was run.")
+
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
   "Run tasks from gruntfile.  Calling with PFX will clear the cache of tasks.
@@ -152,11 +155,23 @@ immaterial."
          (default-directory grunt-current-dir)
          (ret))
     (grunt--message (format "%s" command))
+		(setq grunt-previous-run (list command buf))
     (setq ret (async-shell-command command buf buf))
     ;; handle window sizing: see #6
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
     ret))
+
+(defun grunt-rerun ()
+	"Rerun the previous grunt task."
+  (interactive)
+	(unless grunt-previous-run
+		(error "You have not run a grunt task yet.  Run `grunt-exec` first"))
+	(let ((command (car grunt-previous-run))
+				(buf (cadr grunt-previous-run)))
+		(async-shell-command command buf)
+		(grunt--set-process-dimensions buf)
+		(grunt--set-process-read-only buf)))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
@@ -292,7 +307,8 @@ gruntfile and pulls in the user specified `grunt-options'"
 This means making it read only and locally binding the 'q' key to quit."
   (with-current-buffer buf
     (read-only-mode)
-    (local-set-key (kbd "q") '(lambda () (interactive) (quit-window)))))
+    (local-set-key (kbd "q") '(lambda () (interactive) (quit-window)))
+    (local-set-key (kbd "g") '(lambda () (interactive) (grunt-rerun)))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
