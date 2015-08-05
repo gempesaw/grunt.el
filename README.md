@@ -37,7 +37,8 @@ You can also enter in any valid Grunt task at the prompt.
   overriden your <kbd>q</kbd> key in all shells to
   `(quit-window)`. This is obviously undesirable; execute the
   following elisp when in a shell via <kbd>C-x C-e</kbd> or
-  <kbd>M-:</kbd> to restore functionality. Sorry 'bout that one!
+  <kbd>M-:</kbd> to restore functionality. Sorry 'bout that one! This
+  bug is fixed in v1.1.1.
 
   ```elisp
   (local-set-key (kbd "q") 'self-insert-command)
