@@ -129,7 +129,7 @@ argument when invoking `grunt-exec'."
   "The cache of current grunt tasks.")
 
 (defvar grunt-previous-task nil
-	"Previous task that was run.")
+  "Previous task that was run.")
 
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
@@ -150,26 +150,26 @@ immaterial."
   (let* ((task (ido-completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil)))
-		(setq grunt-previous-task task)
+    (setq grunt-previous-task task)
     (grunt--run task)))
 
 (defun grunt-rerun ()
-	"Rerun the previous grunt task."
+  "Rerun the previous grunt task."
   (interactive)
-	(unless grunt-previous-task
-		(error "You have not run a grunt task yet.  Run `grunt-exec` first"))
-	(grunt--run grunt-previous-task))
+  (unless grunt-previous-task
+    (error "You have not run a grunt task yet.  Run `grunt-exec` first"))
+  (grunt--run grunt-previous-task))
 
 (defun grunt--run (task)
   "Set up the process buffer and run TASK."
-	(let ((cmd (grunt--command task))
-				(buf (grunt--project-task-buffer task))
-				(ret nil))
-		(grunt--message (format "%s" cmd))
-		(setq ret (async-shell-command cmd buf buf))
-		(grunt--set-process-dimensions buf)
-		(grunt--set-process-read-only buf)
-		ret))
+  (let ((cmd (grunt--command task))
+        (buf (grunt--project-task-buffer task))
+        (ret nil))
+    (grunt--message (format "%s" cmd))
+    (setq ret (async-shell-command cmd buf buf))
+    (grunt--set-process-dimensions buf)
+    (grunt--set-process-read-only buf)
+    ret))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
@@ -290,7 +290,7 @@ gruntfile and pulls in the user specified `grunt-options'"
   "Clear the cache of tasks."
   (interactive)
   (setq grunt-current-tasks-cache nil)
-	(setq grunt-previous-task nil))
+  (setq grunt-previous-task nil))
 
 (defun grunt--set-process-dimensions (buf)
   "Set the dimensions of the process buffer BUF."
