@@ -289,7 +289,8 @@ gruntfile and pulls in the user specified `grunt-options'"
 (defun grunt-clear-tasks-cache ()
   "Clear the cache of tasks."
   (interactive)
-  (setq grunt-current-tasks-cache nil))
+  (setq grunt-current-tasks-cache nil)
+	(setq grunt-previous-task nil))
 
 (defun grunt--set-process-dimensions (buf)
   "Set the dimensions of the process buffer BUF."
