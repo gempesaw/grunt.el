@@ -292,7 +292,16 @@ gruntfile and pulls in the user specified `grunt-options'"
 This means making it read only and locally binding the 'q' key to quit."
   (with-current-buffer buf
     (read-only-mode)
-    (local-set-key (kbd "q") '(lambda () (interactive) (quit-window)))))
+    (grunt-process-minor-mode)))
+
+(defvar grunt-process-minor-mode-map (make-sparse-keymap)
+  "Keymap while temp-mode is active.")
+
+(define-minor-mode grunt-process-minor-mode
+  "Minor mode for grunt process key bindings."
+  :init-value nil
+  (define-key grunt-process-minor-mode-map (kbd "g") 'grunt-rerun)
+  (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
