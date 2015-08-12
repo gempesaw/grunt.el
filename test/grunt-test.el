@@ -193,3 +193,10 @@
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
        (grunt-exec 4)
        (should cleared-cache)))))
+
+(ert-deftest should-set-the-previous-task ()
+  (with-grunt-sandbox
+	 (noflet ((ido-completing-read (&rest any) "build")
+						(async-shell-command (&rest args) args))
+					 (grunt-exec)
+					 (should (string= "build" grunt-previous-task)))))
