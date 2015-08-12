@@ -148,9 +148,9 @@
   (with-grunt-sandbox
    (noflet ((ido-completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
-           (grunt-exec)
-           (set-buffer "*grunt-build*<has-gruntfile>")
-           (should buffer-read-only))))
+     (grunt-exec)
+     (set-buffer "*grunt-build*<has-gruntfile>")
+     (should buffer-read-only))))
 
 (ert-deftest should-not-clear-cache-with-same-gruntfile ()
   (with-grunt-sandbox
@@ -196,7 +196,7 @@
 
 (ert-deftest should-set-the-previous-task ()
   (with-grunt-sandbox
-	 (noflet ((ido-completing-read (&rest any) "build")
-						(async-shell-command (&rest args) args))
-					 (grunt-exec)
-					 (should (string= "build" grunt-previous-task)))))
+   (noflet ((ido-completing-read (&rest any) "build")
+            (async-shell-command (&rest args) args))
+     (grunt-exec)
+     (should (string= "build" grunt-previous-task)))))

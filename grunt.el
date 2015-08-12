@@ -203,7 +203,7 @@ extracting the tasks using regexp."
            (result
             (-non-nil
              (-map (lambda (line) (when (string-match "^[\s\t]*\\([a-zA-Z:\-]+?\\)  " line)
-                               (match-string 1 line))) contents))))
+                                    (match-string 1 line))) contents))))
       (if grunt-cache-tasks (setq grunt-current-tasks-cache result) result))))
 
 (defun grunt--resolve-registered-tasks-from-gruntfile ()
