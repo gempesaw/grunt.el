@@ -30,6 +30,20 @@ finds there.
 
 You can also enter in any valid Grunt task at the prompt.
 
+After invoking a grunt task, we'll pop a window and buffer for
+you. While in that window, you have the following keybinds:
+
+- <kbd>q</kbd>: invoke `(quit-window)`, quitting the current window
+  and burying its buffer. Note that since the buffer is buried and not
+  killed, the grunt task will still continue running. For example, you
+  could <kbd>q</kbd> away a long running window like `grunt watch`.
+
+- <kbd>g</kbd>: rerun the most recently run Grunt task. Note that this
+  is _not_ necessarily the task in the current window! That is, if you
+  run `grunt FIRST_TASK` and then `grunt SECOND_TASK`, then go to the
+  buffer for `FIRST_TASK` and hit <kbd>g</kbd>, it will rerun
+  `SECOND_TASK`, since it's the _most recent_ task.
+
 ### breaking changes
 
 - **v1.1.0**: If you happened to install this specific 1.1.0 version
@@ -38,7 +52,7 @@ You can also enter in any valid Grunt task at the prompt.
   `(quit-window)`. This is obviously undesirable; execute the
   following elisp when in a shell via <kbd>C-x C-e</kbd> or
   <kbd>M-:</kbd> to restore functionality. Sorry 'bout that one! This
-  bug is fixed in v1.1.1.
+  bug is fixed in v1.1.1 and newer.
 
   ```elisp
   (local-set-key (kbd "q") 'self-insert-command)
