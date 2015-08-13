@@ -134,8 +134,6 @@
         (noflet ((ido-completing-read (&rest any) "build")
                  (erase-buffer () (setq called t)))
           (grunt-exec)
-          (should (not called))
-          (grunt-exec)
           (should called)))))
 
 (ert-deftest should-kill-existing-buffer ()
