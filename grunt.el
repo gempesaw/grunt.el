@@ -377,5 +377,13 @@ Also enables the highlighting of the links"
 	(interactive)
 	(let ((next-point (car (--drop-while (<= it (point)) grunt-task-links))))
 		(when next-point (goto-char next-point))))
+
+(defun grunt-prev-link ()
+	"Move to the previous debug link.
+Also enables the highlighting of the links"
+  (interactive)
+	(let ((next-point (car (last (--take-while (< it (point)) grunt-task-links)))))
+		(when next-point (goto-char next-point))))
+
 (provide 'grunt)
 ;;; grunt.el ends here

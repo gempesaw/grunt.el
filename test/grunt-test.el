@@ -283,3 +283,21 @@
                                 (grunt-next-link)
                                 (should (eq 80 (point)))
                                 (funcall done))))))))
+
+(ert-deftest-async should-go-to-correct-position-when-navigating-stack-trace-called (done)
+  (with-persistent-sandbox
+    (noflet ((ido-completing-read (&rest any) "build-async-3")
+              (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
+      (let ((proc (grunt-exec)))
+        (set-process-sentinel proc
+          '(lambda (process event) (progn
+                                (set-buffer (process-buffer process))
+                                (goto-char (point-max))
+                                (grunt-prev-link)
+                                (should (eq 71 (point)))
+                                (grunt-prev-link)
+                                (should (eq 10 (point)))
+                                (goto-char 5)
+                                (grunt-prev-link)
+                                (should (eq 5 (point)))
+                                (funcall done))))))))
