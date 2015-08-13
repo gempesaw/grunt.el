@@ -369,7 +369,9 @@ This means making it read only and locally binding the 'q' key to quit."
   "Minor mode for grunt process key bindings."
   :init-value nil
   (define-key grunt-process-minor-mode-map (kbd "g") 'grunt-rerun)
-  (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
+  (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window)))
+  (define-key grunt-process-minor-mode-map (kbd "C-c C-n") '(lambda () (interactive) (grunt-next-link)))
+  (define-key grunt-process-minor-mode-map (kbd "C-c C-p") '(lambda () (interactive) (grunt-prev-link))))
 
 (defun grunt-next-link ()
 	"Move forward to the next debug link.
