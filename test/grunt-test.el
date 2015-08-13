@@ -120,7 +120,8 @@
 (ert-deftest should-execute-grunt-commands ()
   (with-grunt-sandbox
    (noflet ((ido-completing-read (&rest any) "build")
-            (start-process-shell-command (&rest args) args))
+            (start-process-shell-command (&rest args) args)
+            (set-process-filter (p f) nil))
      (let* ((args (grunt-exec))
             (cmd (cadr (cdr args)))
             (buf (buffer-name (cadr args))))
