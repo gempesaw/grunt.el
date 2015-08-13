@@ -164,12 +164,12 @@ immaterial."
   "Set up the process buffer and run TASK."
   (let ((cmd (grunt--command task))
         (buf (grunt--project-task-buffer task))
-        (ret nil))
+        (proc nil))
     (grunt--message (format "%s" cmd))
-    (setq ret (async-shell-command cmd buf buf))
+    (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
-    ret))
+  proc))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."

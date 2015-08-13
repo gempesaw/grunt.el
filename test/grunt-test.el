@@ -120,9 +120,9 @@
 (ert-deftest should-execute-grunt-commands ()
   (with-grunt-sandbox
    (noflet ((ido-completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+            (start-process-shell-command (&rest args) args))
      (let* ((args (grunt-exec))
-            (cmd (car args))
+            (cmd (cadr (cdr args)))
             (buf (buffer-name (cadr args))))
        (should (string-suffix-p "build" cmd))
        (should (string= "*grunt-build*<has-gruntfile>" buf))))))
