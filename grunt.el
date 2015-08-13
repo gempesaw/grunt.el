@@ -170,6 +170,7 @@ immaterial."
         (buf (grunt--project-task-buffer task))
         (proc nil))
     (grunt--message (format "%s" cmd))
+    (setq grunt-task-links nil)
     (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
     (set-process-filter proc #'grunt--process-filter)
     (grunt--set-process-dimensions buf)

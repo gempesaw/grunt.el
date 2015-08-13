@@ -235,3 +235,19 @@
           '(lambda (process event) (progn
                                 (should (equal grunt-task-links '(10 71)))
                                 (funcall done))))))))
+
+(ert-deftest-async should-reset-task-link-positions (done)
+  (with-grunt-sandbox
+    (noflet ((ido-completing-read (&rest any) "build")
+              (grunt--command (task) (format "cat %s" (f-expand "grunt-output.txt" root-test-path))))
+      (let ((proc (grunt-exec)))
+        (set-process-sentinel proc
+          '(lambda (process event)
+             (with-grunt-sandbox
+               (noflet ((ido-completing-read (&rest any) "build")
+                         (start-process-shell-command (&rest any) nil)
+                         (set-process-filter (&rest any) nil))
+                 (should (not (eq nil grunt-task-links)))
+                 (grunt-exec)
+                 (should (not grunt-task-links))
+                 (funcall done)))))))))
