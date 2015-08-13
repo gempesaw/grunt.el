@@ -194,6 +194,16 @@ immaterial."
 	'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
 	'action 'grunt--go-to-stack-trace))
 
+(defun grunt--go-to-stack-trace (args)
+ "Go to stack trace file from a button action callback with ARGS."
+ (let ((file-name (button-get args 'file-name))
+			 (line-num (string-to-number (button-get args 'line-num)))
+			 (char-num (string-to-number (button-get args 'char-num))))
+	(ring-insert find-tag-marker-ring (point-marker))
+	(find-file file-name)
+	(goto-line line-num)
+	(forward-char (+ -1 char-num))))
+
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
   (let* ((bufname (format "*grunt-%s*<%s>" task grunt-current-project))
