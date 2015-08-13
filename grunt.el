@@ -185,9 +185,9 @@ immaterial."
         (save-excursion
 					(goto-char start-point)
           (while (re-search-forward "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)" nil t)
-            (when (match-string 0)
-              (make-button (match-beginning 0) (match-end 0)))))
-        (set-marker (process-mark proc) (point))))))
+            (when (match-string 0) (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
+			 (set-marker (process-mark proc) (point))))))
+
 (defun grunt--make-stack-trace-button (beg end m)
  "Make a button from BEG to END which will click through to match found in M."
  (make-button beg end
