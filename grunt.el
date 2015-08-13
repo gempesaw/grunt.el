@@ -168,19 +168,25 @@ immaterial."
         (proc nil))
     (grunt--message (format "%s" cmd))
     (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
-    (set-process-filter proc #'grunt--apply-ansi-color)
+    (set-process-filter proc #'grunt--process-filter)
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
   proc))
 
-(defun grunt--apply-ansi-color (proc string)
-  "Filter to function for process PROC to apply ansi color to STRING."
+(defun grunt--process-filter (proc string)
+  "Filter function for process PROC to apply ansi color and highlight links in STRING."
   (when (buffer-live-p (process-buffer proc))
     (with-current-buffer (process-buffer proc)
-      (let ((inhibit-read-only t))
+      (let ((inhibit-read-only t)
+						(start-point (process-mark proc)))
         ;; Insert the text, advancing the process marker.
         (insert string)
         (ansi-color-apply-on-region (process-mark proc) (point))
+        (save-excursion
+					(goto-char start-point)
+          (while (re-search-forward "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)" nil t)
+            (when (match-string 0)
+              (make-button (match-beginning 0) (match-end 0)))))
         (set-marker (process-mark proc) (point))))))
 
 (defun grunt--project-task-buffer (task)
