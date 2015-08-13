@@ -175,7 +175,6 @@ immaterial."
 
 (defun grunt--apply-ansi-color (proc string)
   "Filter to function for process PROC to apply ansi color to STRING."
-  (message "APPLYING COLOR")
   (when (buffer-live-p (process-buffer proc))
     (with-current-buffer (process-buffer proc)
       (let ((inhibit-read-only t))
