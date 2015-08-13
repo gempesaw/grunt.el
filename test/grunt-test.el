@@ -137,8 +137,7 @@
 (ert-deftest should-set-column-width ()
   (with-grunt-sandbox
    (let ((process-resized 0))
-     (noflet ((ido-completing-read (&rest any) "build")
-              (async-shell-command (&rest args) args)
+     (noflet ((ido-completing-read (&rest any) "build") 
               (grunt--set-process-dimensions (buf)
                                              (setq process-resized (1+ process-resized))))
        (grunt-exec)
@@ -146,8 +145,7 @@
 
 (ert-deftest should-set-process-to-read-only ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+   (noflet ((ido-completing-read (&rest any) "build"))
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should buffer-read-only))))
@@ -189,14 +187,12 @@
   (with-grunt-sandbox
    (let ((cleared-cache nil))
      (noflet ((ido-completing-read (&rest any) "build")
-              (async-shell-command (&rest args) args)
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
        (grunt-exec 4)
        (should cleared-cache)))))
 
 (ert-deftest should-set-the-previous-task ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+   (noflet ((ido-completing-read (&rest any) "build"))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
