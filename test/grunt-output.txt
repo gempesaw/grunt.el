@@ -1,0 +1,2 @@
+Error at /example/path/to/a/file.js:123:45
+Because of call to func at /example/path/to/a/different/file.js:987:65

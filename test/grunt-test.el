@@ -1,5 +1,6 @@
 (require 'f)
 (require 'noflet)
+(require 'ert-async)
 
 ;;; set up copied blatantly from
 ;;; http://tuxicity.se/emacs/testing/cask/ert-runner/2013/09/26/unit-testing-in-emacs.html
@@ -223,3 +224,14 @@
    (noflet ((ido-completing-read (&rest any) "build"))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
+
+(ert-deftest-async should-calculate-correct-task-link-positions (done)
+  (with-grunt-sandbox
+    (noflet ((ido-completing-read (&rest any) "build")
+              (grunt--command (task)
+                (format "cat %s" (f-expand "grunt-output.txt" root-test-path))))
+      (let ((proc (grunt-exec)))
+        (set-process-sentinel proc
+          '(lambda (process event) (progn
+                                (should (equal grunt-task-links '(10 71)))
+                                (funcall done))))))))

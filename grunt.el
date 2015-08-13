@@ -132,6 +132,9 @@ argument when invoking `grunt-exec'."
 (defvar grunt-previous-task nil
   "Previous task that was run.")
 
+(defvar grunt-task-links '()
+  "A list of points to the task links.")
+
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
   "Run tasks from gruntfile.  Calling with PFX will clear the cache of tasks.
@@ -191,7 +194,9 @@ immaterial."
        (save-excursion
         (goto-char start-point)
         (while (re-search-forward regexp nil t)
-         (when (match-string 0) (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
+          (when (match-string 0)
+            (setq grunt-task-links (append grunt-task-links (list (match-beginning 0))))
+            (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
 			 (set-marker (process-mark proc) (point))))))
 
 (defun grunt--make-stack-trace-button (beg end m)
