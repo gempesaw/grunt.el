@@ -188,6 +188,11 @@ immaterial."
             (when (match-string 0)
               (make-button (match-beginning 0) (match-end 0)))))
         (set-marker (process-mark proc) (point))))))
+(defun grunt--make-stack-trace-button (beg end m)
+ "Make a button from BEG to END which will click through to match found in M."
+ (make-button beg end
+	'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
+	'action 'grunt--go-to-stack-trace))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
