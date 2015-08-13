@@ -161,6 +161,14 @@
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should buffer-read-only))))
 
+(ert-deftest should-set-process-filter-to-apply-ansi-color ()
+  (with-grunt-sandbox
+   (let ((called nil))
+     (noflet ((ido-completing-read (&rest any) "build")
+              (set-process-filter (p f) (setq called t)))
+             (grunt-exec)
+             (should called)))))
+
 (ert-deftest should-not-clear-cache-with-same-gruntfile ()
   (with-grunt-sandbox
    (let ((grunt-cache-tasks t)

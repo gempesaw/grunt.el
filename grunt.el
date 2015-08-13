@@ -167,6 +167,7 @@ immaterial."
         (proc nil))
     (grunt--message (format "%s" cmd))
     (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
+    (set-process-filter proc #'grunt--apply-ansi-color)
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
   proc))
@@ -304,6 +305,7 @@ gruntfile and pulls in the user specified `grunt-options'"
   "Set the dimensions of the process buffer BUF."
   (let ((process (get-buffer-process buf)))
     (when process
+      (display-buffer buf '(nil (allow-no-window . t)))
       (set-process-window-size process
                                (window-height)
                                (window-width)))))
