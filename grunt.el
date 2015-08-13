@@ -6,7 +6,7 @@
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; URL: https://github.com/gempesaw/grunt.el
-;; Package-Requires: ((dash "2.9.0"))
+;; Package-Requires: ((dash "2.9.0") (ansi-color "3.4.2"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'ansi-color)
 
 (defgroup grunt nil
   "Execute grunt tasks from your Gruntfile from Emacs"
@@ -171,6 +172,17 @@ immaterial."
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
   proc))
+
+(defun grunt--apply-ansi-color (proc string)
+  "Filter to function for process PROC to apply ansi color to STRING."
+  (message "APPLYING COLOR")
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (let ((inhibit-read-only t))
+        ;; Insert the text, advancing the process marker.
+        (insert string)
+        (ansi-color-apply-on-region (process-mark proc) (point))
+        (set-marker (process-mark proc) (point))))))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."

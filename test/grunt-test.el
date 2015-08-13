@@ -169,6 +169,15 @@
              (grunt-exec)
              (should called)))))
 
+(ert-deftest should-apply-ansi-color-to-the-string ()
+  (with-grunt-sandbox
+   (let ((called nil))
+     (noflet ((ido-completing-read (&rest any) "build")
+              (ansi-color-apply-on-region () (setq called t)))
+      (grunt-exec)
+      ;; (should called)
+      ))))
+
 (ert-deftest should-not-clear-cache-with-same-gruntfile ()
   (with-grunt-sandbox
    (let ((grunt-cache-tasks t)
