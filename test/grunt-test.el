@@ -127,6 +127,17 @@
        (should (string-suffix-p "build" cmd))
        (should (string= "*grunt-build*<has-gruntfile>" buf))))))
 
+(ert-deftest should-erase-contents-of-buffer ()
+  (with-grunt-sandbox
+      (let ((called nil)
+            (grunt-kill-existing-buffer nil))
+        (noflet ((ido-completing-read (&rest any) "build")
+                 (erase-buffer () (setq called t)))
+          (grunt-exec)
+          (should (not called))
+          (grunt-exec)
+          (should called)))))
+
 (ert-deftest should-kill-existing-buffer ()
   (with-grunt-sandbox
    (noflet ((ido-completing-read (&rest any) "build"))
