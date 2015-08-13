@@ -371,5 +371,11 @@ This means making it read only and locally binding the 'q' key to quit."
   (define-key grunt-process-minor-mode-map (kbd "g") 'grunt-rerun)
   (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
 
+(defun grunt-next-link ()
+	"Move forward to the next debug link.
+Also enables the highlighting of the links"
+	(interactive)
+	(let ((next-point (car (--drop-while (<= it (point)) grunt-task-links))))
+		(when next-point (goto-char next-point))))
 (provide 'grunt)
 ;;; grunt.el ends here
