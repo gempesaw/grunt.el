@@ -183,7 +183,7 @@ immaterial."
         (insert string)
         (ansi-color-apply-on-region (process-mark proc) (point))
         (save-excursion
-					(goto-char start-point)
+					(goto-char 0)
           (while (re-search-forward "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)" nil t)
             (when (match-string 0) (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
 			 (set-marker (process-mark proc) (point))))))
