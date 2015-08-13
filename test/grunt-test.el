@@ -16,6 +16,8 @@
 (defvar root-sandbox-path
   (f-expand "sandbox" root-test-path))
 
+(defvar mock-grunt-output-file (f-expand "grunt-output.txt" root-test-path))
+
 (defvar mock-gruntfile-dir "has-gruntfile")
 
 (defun mock-grunt-help ()
@@ -59,6 +61,19 @@
      (grunt-locate-gruntfile)
      ,@body
      (f-delete root-sandbox-path :force)))
+
+(defmacro with-persistent-sandbox (&rest body)
+  "Evaluate BODY in an empty temporary directory that persists"
+  `(let ((default-directory (f-expand mock-gruntfile-dir root-sandbox-path))
+         (grunt-current-tasks-cache nil)
+         (grunt-current-path "")
+         (grunt-current-dir "")
+         (grunt-current-project "")
+         (grunt-verbose nil))
+     (f-mkdir root-sandbox-path default-directory)
+     (f-touch (f-expand "Gruntfile.js" default-directory))
+     (grunt-locate-gruntfile)
+     ,@body))
 
 (ert-deftest should-find-grunt-binary-in-path ()
   (should (not (eq nil grunt-base-command))))
@@ -226,10 +241,9 @@
      (should (string= "build" grunt-previous-task)))))
 
 (ert-deftest-async should-calculate-correct-task-link-positions (done)
-  (with-grunt-sandbox
-    (noflet ((ido-completing-read (&rest any) "build")
-              (grunt--command (task)
-                (format "cat %s" (f-expand "grunt-output.txt" root-test-path))))
+  (with-persistent-sandbox
+    (noflet ((ido-completing-read (&rest any) "build-async-1")
+              (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
       (let ((proc (grunt-exec)))
         (set-process-sentinel proc
           '(lambda (process event) (progn
@@ -237,14 +251,14 @@
                                 (funcall done))))))))
 
 (ert-deftest-async should-reset-task-link-positions (done)
-  (with-grunt-sandbox
-    (noflet ((ido-completing-read (&rest any) "build")
-              (grunt--command (task) (format "cat %s" (f-expand "grunt-output.txt" root-test-path))))
+  (with-persistent-sandbox
+    (noflet ((ido-completing-read (&rest any) "build-async-2-a")
+              (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
       (let ((proc (grunt-exec)))
         (set-process-sentinel proc
           '(lambda (process event)
-             (with-grunt-sandbox
-               (noflet ((ido-completing-read (&rest any) "build")
+             (with-persistent-sandbox
+               (noflet ((ido-completing-read (&rest any) "build-async-2-b")
                          (start-process-shell-command (&rest any) nil)
                          (set-process-filter (&rest any) nil))
                  (should (not (eq nil grunt-task-links)))
