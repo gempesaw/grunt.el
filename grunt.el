@@ -178,14 +178,20 @@ immaterial."
   (when (buffer-live-p (process-buffer proc))
     (with-current-buffer (process-buffer proc)
       (let ((inhibit-read-only t)
-						(start-point (process-mark proc)))
-        ;; Insert the text, advancing the process marker.
-        (insert string)
-        (ansi-color-apply-on-region (process-mark proc) (point))
-        (save-excursion
-					(goto-char 0)
-          (while (re-search-forward "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)" nil t)
-            (when (match-string 0) (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
+            (regexp "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)")
+            (start-point (point-min)))
+       ;; Calculate the point of the last Path found
+       (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward regexp nil t)
+         (setq start-point (match-end 0))))
+       (insert string)
+       (ansi-color-apply-on-region (process-mark proc) (point))
+       ;; Make buttons out of matched paths from previous last one
+       (save-excursion
+        (goto-char last-button-point)
+        (while (re-search-forward regexp nil t)
+         (when (match-string 0) (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
 			 (set-marker (process-mark proc) (point))))))
 
 (defun grunt--make-stack-trace-button (beg end m)
