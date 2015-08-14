@@ -266,7 +266,7 @@
                  (should (not grunt-task-links))
                  (funcall done)))))))))
 
-(ert-deftest-async should-go-to-correct-position-when-navigating-stack-trace-called (done)
+(ert-deftest-async should-go-to-correct-position-when-navigating-trace-forwards (done)
   (with-persistent-sandbox
     (noflet ((ido-completing-read (&rest any) "build-async-3")
               (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
@@ -284,7 +284,7 @@
                                 (should (eq 80 (point)))
                                 (funcall done))))))))
 
-(ert-deftest-async should-go-to-correct-position-when-navigating-stack-trace-called (done)
+(ert-deftest-async should-go-to-correct-position-when-navigating-trace-backwards (done)
   (with-persistent-sandbox
     (noflet ((ido-completing-read (&rest any) "build-async-3")
               (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))

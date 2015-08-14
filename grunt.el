@@ -197,16 +197,16 @@ immaterial."
         (while (re-search-forward regexp nil t)
           (when (match-string 0)
             (setq grunt-task-links (append grunt-task-links (list (match-beginning 0))))
-            (grunt--make-stack-trace-button (match-beginning 0) (match-end 0) 'match-string))))
+            (grunt--make-trace-button (match-beginning 0) (match-end 0) 'match-string))))
 			 (set-marker (process-mark proc) (point))))))
 
-(defun grunt--make-stack-trace-button (beg end m)
+(defun grunt--make-trace-button (beg end m)
  "Make a button from BEG to END which will click through to match found in M."
  (make-button beg end
 	'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
-	'action 'grunt--go-to-stack-trace))
+	'action 'grunt--go-to-trace))
 
-(defun grunt--go-to-stack-trace (args)
+(defun grunt--go-to-trace (args)
  "Go to stack trace file from a button action callback with ARGS."
  (let ((file-name (button-get args 'file-name))
 			 (line-num (string-to-number (button-get args 'line-num)))
