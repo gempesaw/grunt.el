@@ -126,6 +126,10 @@ argument when invoking `grunt-exec'."
   :type 'boolean
   :group 'grunt)
 
+(defface grunt-trace-link-face
+  '((default :underline t))
+  "Basic underlining face")
+
 (defvar grunt-current-tasks-cache nil
   "The cache of current grunt tasks.")
 
@@ -204,7 +208,8 @@ immaterial."
  "Make a button from BEG to END which will click through to match found in M."
  (make-button beg end
 	'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
-	'action 'grunt--go-to-trace))
+   'action 'grunt--go-to-trace
+   'face 'grunt-trace-link-face))
 
 (defun grunt--go-to-trace (args)
  "Go to stack trace file from a button action callback with ARGS."
