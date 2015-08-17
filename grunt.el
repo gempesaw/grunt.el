@@ -169,6 +169,7 @@ immaterial."
     (setq ret (async-shell-command cmd buf buf))
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
+    (grunt--set-process-buffer-task buf task)
     ret))
 
 (defun grunt--project-task-buffer (task)
@@ -308,13 +309,18 @@ This means making it read only and locally binding the 'q' key to quit."
     (read-only-mode)
     (grunt-process-minor-mode)))
 
+(defun grunt--set-process-buffer-task (buf task)
+  "Set a buffer local variable on BUF for the TASK it is running."
+  (with-current-buffer buf
+    (setq-local grunt-buffer-task task)))
+
 (defvar grunt-process-minor-mode-map (make-sparse-keymap)
   "Keymap while temp-mode is active.")
 
 (define-minor-mode grunt-process-minor-mode
   "Minor mode for grunt process key bindings."
   :init-value nil
-  (define-key grunt-process-minor-mode-map (kbd "g") 'grunt-rerun)
+  (define-key grunt-process-minor-mode-map (kbd "g") '(lambda () (interactive) (grunt--run (buffer-local-value 'grunt-buffer-task (current-buffer)))))
   (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
 
 (provide 'grunt)
