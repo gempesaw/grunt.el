@@ -177,9 +177,14 @@ immaterial."
     (setq grunt-task-links nil)
     (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
     (set-process-filter proc #'grunt--process-filter)
+    (set-process-sentinel proc #'grunt--process-sentinel)
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
-  proc))
+    proc))
+
+(defun grunt--process-sentinel (proc evt)
+  "Sentinel function to report the status of PROC and print the associated EVT."
+  (grunt--message (format "%s: %s" proc evt)))
 
 (defun grunt--process-filter (proc string)
   "Filter function for process PROC to apply ansi color and highlight links in STRING."

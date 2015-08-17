@@ -20,6 +20,8 @@
 
 (defvar mock-gruntfile-dir "has-gruntfile")
 
+(setq grunt-verbose nil)
+
 (defun mock-grunt-help ()
   "Return stub data for the grunt-help command."
   (with-temp-buffer
@@ -52,8 +54,7 @@
          (grunt-current-tasks-cache nil)
          (grunt-current-path "")
          (grunt-current-dir "")
-         (grunt-current-project "")
-         (grunt-verbose nil))
+         (grunt-current-project ""))
      (when (f-dir? root-sandbox-path)
        (f-delete root-sandbox-path :force))
      (f-mkdir root-sandbox-path default-directory)
@@ -68,8 +69,7 @@
          (grunt-current-tasks-cache nil)
          (grunt-current-path "")
          (grunt-current-dir "")
-         (grunt-current-project "")
-         (grunt-verbose nil))
+         (grunt-current-project ""))
      (f-mkdir root-sandbox-path default-directory)
      (f-touch (f-expand "Gruntfile.js" default-directory))
      (grunt-locate-gruntfile)
@@ -137,7 +137,8 @@
   (with-grunt-sandbox
    (noflet ((ido-completing-read (&rest any) "build")
             (start-process-shell-command (&rest args) args)
-            (set-process-filter (p f) nil))
+            (set-process-filter (p f) nil)
+            (set-process-sentinel (p f) nil))
      (let* ((args (grunt-exec))
             (cmd (cadr (cdr args)))
             (buf (buffer-name (cadr args))))
@@ -163,7 +164,7 @@
 (ert-deftest should-set-column-width ()
   (with-grunt-sandbox
    (let ((process-resized 0))
-     (noflet ((ido-completing-read (&rest any) "build") 
+     (noflet ((ido-completing-read (&rest any) "build")
               (grunt--set-process-dimensions (buf)
                                              (setq process-resized (1+ process-resized))))
        (grunt-exec)
@@ -243,7 +244,7 @@
 (ert-deftest-async should-calculate-correct-task-link-positions (done)
   (with-persistent-sandbox
     (noflet ((ido-completing-read (&rest any) "build-async-1")
-              (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
+             (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
       (let ((proc (grunt-exec)))
         (set-process-sentinel proc
           '(lambda (process event) (progn
@@ -253,14 +254,15 @@
 (ert-deftest-async should-reset-task-link-positions (done)
   (with-persistent-sandbox
     (noflet ((ido-completing-read (&rest any) "build-async-2-a")
-              (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
+             (grunt--command (&rest any) (format "cat %s" mock-grunt-output-file)))
       (let ((proc (grunt-exec)))
         (set-process-sentinel proc
           '(lambda (process event)
              (with-persistent-sandbox
                (noflet ((ido-completing-read (&rest any) "build-async-2-b")
-                         (start-process-shell-command (&rest any) nil)
-                         (set-process-filter (&rest any) nil))
+                        (start-process-shell-command (&rest any) nil)
+                        (set-process-filter (&rest any) nil)
+                        (set-process-sentinel (&rest any) nil))
                  (should (not (eq nil grunt-task-links)))
                  (grunt-exec)
                  (should (not grunt-task-links))
