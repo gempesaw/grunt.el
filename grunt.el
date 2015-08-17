@@ -188,38 +188,38 @@ immaterial."
       (let ((inhibit-read-only t)
             (regexp "\\(/[a-z0-9-\._/]+\\):\\([0-9]+\\):\\([0-9]+\\)")
             (start-point (point-min)))
-       ;; Calculate the point of the last Path found
-       (save-excursion
+        ;; Calculate the point of the last Path found
         (goto-char (point-min))
         (while (re-search-forward regexp nil t)
-         (setq start-point (match-end 0))))
-       (insert string)
-       (ansi-color-apply-on-region (process-mark proc) (point))
-       ;; Make buttons out of matched paths from previous last one
-       (save-excursion
-        (goto-char start-point)
-        (while (re-search-forward regexp nil t)
-          (when (match-string 0)
-            (setq grunt-task-links (append grunt-task-links (list (match-beginning 0))))
-            (grunt--make-trace-button (match-beginning 0) (match-end 0) 'match-string))))
-			 (set-marker (process-mark proc) (point))))))
+          (setq start-point (match-end 0)))
+        (goto-char (point-max))
+        (insert string)
+        (ansi-color-apply-on-region (process-mark proc) (point-max))
+        ;; Make buttons out of matched paths from previous last one
+        (save-excursion
+          (goto-char start-point)
+          (while (re-search-forward regexp nil t)
+            (when (match-string 0)
+              (setq grunt-task-links (append grunt-task-links (list (match-beginning 0))))
+              (grunt--make-trace-button (match-beginning 0) (match-end 0) 'match-string))))
+        (set-marker (process-mark proc) (point-max))))))
 
 (defun grunt--make-trace-button (beg end m)
  "Make a button from BEG to END which will click through to match found in M."
  (make-button beg end
-	'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
+  'file-name (funcall m 1) 'line-num (funcall m 2) 'char-num (funcall m 3)
    'action 'grunt--go-to-trace
    'face 'grunt-trace-link-face))
 
 (defun grunt--go-to-trace (args)
  "Go to stack trace file from a button action callback with ARGS."
  (let ((file-name (button-get args 'file-name))
-			 (line-num (string-to-number (button-get args 'line-num)))
-			 (char-num (string-to-number (button-get args 'char-num))))
-	(ring-insert find-tag-marker-ring (point-marker))
-	(find-file file-name)
-	(goto-line line-num)
-	(forward-char (+ -1 char-num))))
+       (line-num (string-to-number (button-get args 'line-num)))
+       (char-num (string-to-number (button-get args 'char-num))))
+  (ring-insert find-tag-marker-ring (point-marker))
+  (find-file file-name)
+  (goto-line line-num)
+  (forward-char (+ -1 char-num))))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
@@ -379,18 +379,18 @@ This means making it read only and locally binding the 'q' key to quit."
   (define-key grunt-process-minor-mode-map (kbd "C-c C-p") '(lambda () (interactive) (grunt-prev-link))))
 
 (defun grunt-next-link ()
-	"Move forward to the next debug link.
-Also enables the highlighting of the links"
-	(interactive)
-	(let ((next-point (car (--drop-while (<= it (point)) grunt-task-links))))
-		(when next-point (goto-char next-point))))
-
-(defun grunt-prev-link ()
-	"Move to the previous debug link.
+  "Move forward to the next debug link.
 Also enables the highlighting of the links"
   (interactive)
-	(let ((next-point (car (last (--take-while (< it (point)) grunt-task-links)))))
-		(when next-point (goto-char next-point))))
+  (let ((next-point (car (--drop-while (<= it (point)) grunt-task-links))))
+    (when next-point (goto-char next-point))))
+
+(defun grunt-prev-link ()
+  "Move to the previous debug link.
+Also enables the highlighting of the links"
+  (interactive)
+  (let ((next-point (car (last (--take-while (< it (point)) grunt-task-links)))))
+    (when next-point (goto-char next-point))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
