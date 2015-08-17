@@ -1,5 +1,5 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
-;; Version: 1.2.1
+;; Version: 1.2.2
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 

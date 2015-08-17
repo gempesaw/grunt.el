@@ -38,11 +38,7 @@ you. While in that window, you have the following keybinds:
   killed, the grunt task will still continue running. For example, you
   could <kbd>q</kbd> away a long running window like `grunt watch`.
 
-- <kbd>g</kbd>: rerun the most recently run Grunt task. Note that this
-  is _not_ necessarily the task in the current window! That is, if you
-  run `grunt FIRST_TASK` and then `grunt SECOND_TASK`, then go to the
-  buffer for `FIRST_TASK` and hit <kbd>g</kbd>, it will rerun
-  `SECOND_TASK`, since it's the _most recent_ task.
+- <kbd>g</kbd>: rerun that buffer's Grunt task.
 
 ### breaking changes
 
