@@ -147,7 +147,7 @@
 (ert-deftest should-set-column-width ()
   (with-grunt-sandbox
    (let ((process-resized 0))
-     (noflet ((ido-completing-read (&rest any) "build") 
+     (noflet ((ido-completing-read (&rest any) "build")
               (grunt--set-process-dimensions (buf)
                                              (setq process-resized (1+ process-resized))))
        (grunt-exec)
@@ -223,3 +223,10 @@
    (noflet ((ido-completing-read (&rest any) "build"))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
+
+(ert-deftest should-set-the-buffer-local-task ()
+  (with-grunt-sandbox
+   (noflet ((ido-completing-read (&rest any) "build"))
+     (grunt-exec)
+     (set-buffer "*grunt-build*<has-gruntfile>")
+     (should (string= "build" (buffer-local-value 'grunt-buffer-task (current-buffer)))))))
