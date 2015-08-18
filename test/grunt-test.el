@@ -200,3 +200,11 @@
             (async-shell-command (&rest args) args))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
+
+(ert-deftest should-set-the-buffer-local-task ()
+  (with-grunt-sandbox
+   (noflet ((ido-completing-read (&rest any) "build")
+            (async-shell-command (&rest args) args))
+     (grunt-exec)
+     (set-buffer "*grunt-build*<has-gruntfile>")
+     (should (string= "build" (buffer-local-value 'grunt-buffer-task (current-buffer)))))))
