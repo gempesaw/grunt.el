@@ -200,7 +200,7 @@ immaterial."
 Sets the buffer to non read only mode when it's erased, this should be reset
 as soon as the task begins running."
   (when (buffer-live-p buf)
-    (with-current-buffer buf (read-only-mode 0) (erase-buffer))))
+    (with-current-buffer buf (let ((inhibit-read-only t)) (erase-buffer)))))
 
 (defun grunt-resolve-registered-tasks ()
   "Build a list of Grunt tasks.
