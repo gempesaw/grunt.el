@@ -133,7 +133,7 @@
 
 (ert-deftest should-execute-grunt-commands ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
+   (noflet ((completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
      (let* ((args (grunt-exec))
             (cmd (car args))
@@ -143,7 +143,7 @@
 
 (ert-deftest should-kill-existing-buffer ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build"))
+   (noflet ((completing-read (&rest any) "build"))
      (grunt-exec)
      (grunt-exec)
      (should t))))
@@ -151,7 +151,7 @@
 (ert-deftest should-set-column-width ()
   (with-grunt-sandbox
    (let ((process-resized 0))
-     (noflet ((ido-completing-read (&rest any) "build")
+     (noflet ((completing-read (&rest any) "build")
               (async-shell-command (&rest args) args)
               (grunt--set-process-dimensions (buf)
                                              (setq process-resized (1+ process-resized))))
@@ -160,7 +160,7 @@
 
 (ert-deftest should-set-process-to-read-only ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
+   (noflet ((completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
@@ -170,13 +170,13 @@
   (with-grunt-sandbox
    (let ((grunt-cache-tasks t)
          (cleared-cache nil))
-     (noflet ((ido-completing-read (&rest any) "build")
+     (noflet ((completing-read (&rest any) "build")
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
        (dotimes (i 2) (grunt-exec))
        (should (not cleared-cache))))))
 
 (ert-deftest should-not-clear-cache-when-caching-disabled ()
-  (noflet ((ido-completing-read (&rest any) "build")
+  (noflet ((completing-read (&rest any) "build")
            (grunt-clear-tasks-cache () (setq cleared-cache t)))
     (let ((grunt-cache-tasks nil)
           (cleared-cache nil))
@@ -188,7 +188,7 @@
          (should (not cleared-cache)))))))
 
 (ert-deftest should-clear-cache-when-gruntfile-changes ()
-  (noflet ((ido-completing-read (&rest any) "build")
+  (noflet ((completing-read (&rest any) "build")
            (grunt-clear-tasks-cache () (setq cleared-cache t)))
     (let ((grunt-cache-tasks t)
           (cleared-cache nil))
@@ -202,7 +202,7 @@
 (ert-deftest should-clear-cache-on-prefix-arg ()
   (with-grunt-sandbox
    (let ((cleared-cache nil))
-     (noflet ((ido-completing-read (&rest any) "build")
+     (noflet ((completing-read (&rest any) "build")
               (async-shell-command (&rest args) args)
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
        (grunt-exec 4)
@@ -210,14 +210,14 @@
 
 (ert-deftest should-set-the-previous-task ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
+   (noflet ((completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
 
 (ert-deftest should-set-the-buffer-local-task ()
   (with-grunt-sandbox
-   (noflet ((ido-completing-read (&rest any) "build")
+   (noflet ((completing-read (&rest any) "build")
             (async-shell-command (&rest args) args))
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")

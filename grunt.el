@@ -147,7 +147,7 @@ immaterial."
   (unless (grunt-locate-gruntfile)
     (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
   (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
-  (let* ((task (ido-completing-read
+  (let* ((task (completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil)))
     (setq grunt-previous-task task)
