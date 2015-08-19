@@ -103,7 +103,7 @@
      (setq grunt-base-command nil)
      (setq grunt-help-command (format "%s --help --no-color" grunt-base-command))
      (noflet ((shell-command-to-string (&rest args) (car args)))
-       (should (not (string-match-p " nil --help" (grunt--get-help)))))
+       (should-not (string-match-p " nil --help" (grunt--get-help))))
 
      ;; cleanup...
      (setq grunt-base-command prev-base-cmd)
