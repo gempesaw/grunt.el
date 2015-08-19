@@ -92,22 +92,12 @@
 
 (ert-deftest should-use-valid-grunt-help-command ()
   (with-grunt-sandbox
-   (let ((prev-base-cmd grunt-base-command)
-         ;; in the case that we no longer use `grunt-help-command' at
-         ;; all, it's void and we need a sensible default.
-         (prev-help-cmd (if (boundp 'grunt-help-command)
-                            grunt-help-command
-                          "")))
+   (let ((grunt-base-command nil)
+         (grunt-help-command (format "%s --help --no-color" grunt-base-command)))
      ;; pretend like we couldn't resolve grunt-base-command, and that
      ;; grunt-help-command is in a similar quagmire
-     (setq grunt-base-command nil)
-     (setq grunt-help-command (format "%s --help --no-color" grunt-base-command))
      (noflet ((shell-command-to-string (&rest args) (car args)))
-       (should-not (string-match-p " nil --help" (grunt--get-help))))
-
-     ;; cleanup...
-     (setq grunt-base-command prev-base-cmd)
-     (setq grunt-help-command prev-help-cmd))))
+       (should-not (string-match-p " nil --help" (grunt--get-help)))))))
 
 (ert-deftest should-throw-when-missing-grunt-binary ()
   (with-grunt-sandbox
