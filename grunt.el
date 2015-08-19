@@ -58,8 +58,8 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
-(defcustom grunt-help-command (format "%s --help --no-color" grunt-base-command)
-  "Command to get the help section from grunt."
+(defcustom grunt-help-args "--help --no-color"
+  "Arguments to pass to grunt CLI to get the help section."
   :type 'string
   :group 'grunt)
 
@@ -244,8 +244,15 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
 This function will return the cached version of the command if
 the cache is not empty."
   (grunt--message "Building task list from grunt --help, one moment...")
-  (shell-command-to-string
-   (format "cd %s; %s" grunt-current-dir grunt-help-command)))
+  (let ((default-directory grunt-current-dir))
+    (shell-command-to-string (grunt--help-command))))
+
+(defun grunt--help-command ()
+  "Build an appropriate `grunt --help` command for the current project.
+
+Using `grunt--command' to generate the help command ensures that
+we have a valid `grunt-base-command'."
+  (grunt--command grunt-help-args))
 
 (defun grunt-resolve-options ()
   "Set up the arguments to the grunt binary.
