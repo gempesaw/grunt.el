@@ -109,6 +109,12 @@
      (setq grunt-base-command prev-base-cmd)
      (setq grunt-help-command prev-help-cmd))))
 
+(ert-deftest should-throw-when-missing-grunt-binary ()
+  (with-grunt-sandbox
+   (noflet ((executable-find (binary) nil))
+     (let ((grunt-base-command nil))
+       (should-error (grunt--command))))))
+
 (ert-deftest should-resolve-registered-tasks-via-regex ()
   (with-grunt-sandbox
    (let ((grunt-show-all-tasks nil))

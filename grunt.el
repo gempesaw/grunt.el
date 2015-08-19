@@ -270,8 +270,11 @@ gruntfile and pulls in the user specified `grunt-options'"
 
 (defun grunt--command (task)
   "Return the grunt command for the specified TASK."
+  ;; if necessary, let's lookup the grunt executable again, and throw
+  ;; if we still can't find one...
   (unless grunt-base-command
-    (setq grunt-base-command (executable-find "grunt")))
+    (unless (setq grunt-base-command (executable-find "grunt"))
+      (error "Couldn't locate the grunt executable; please setq `grunt-base-command' manually")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt--message (s)
