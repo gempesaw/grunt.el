@@ -180,6 +180,7 @@ immaterial."
     (with-current-buffer (process-buffer proc)
       (let ((inhibit-read-only t))
         ;; Insert the text, advancing the process marker.
+        (goto-char (process-mark proc))
         (insert string)
         (ansi-color-apply-on-region (process-mark proc) (point))
         (set-marker (process-mark proc) (point))))))
