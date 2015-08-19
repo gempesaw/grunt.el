@@ -244,3 +244,14 @@
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should (string= "build" (buffer-local-value 'grunt-buffer-task (current-buffer)))))))
+
+(ert-deftest should-set-save-excursion-process-filter ()
+  (with-grunt-sandbox
+   (let ((process-filter nil)
+         (grunt-move-task-point t))
+     (noflet ((completing-read (&rest any) "build")
+              (set-process-filter (p f) (setq process-filter f)))
+       (grunt-exec)
+       (should (string=
+                "grunt--apply-ansi-color-save-excursion"
+                (format "%s" process-filter)))))))

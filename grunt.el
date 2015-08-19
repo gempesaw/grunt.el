@@ -126,6 +126,21 @@ argument when invoking `grunt-exec'."
   :type 'boolean
   :group 'grunt)
 
+(defcustom grunt-move-task-point nil
+  "Whether you want to move the point around in task buffers
+
+Defaults to nil: whenever your task buffer outputs content, we'll
+colorize it and force the point to the bottom of the buffer so
+you can see your task's new content.
+
+If t, then you can move your point around the task buffer as you
+please, and if you want to follow the new content from your task,
+you'll have to move the point to the end of the task buffer
+manually, and then our process filter will track the task content
+as expected."
+  :type 'boolean
+  :group 'grunt)
+
 (defvar grunt-current-tasks-cache nil
   "The cache of current grunt tasks.")
 
@@ -168,7 +183,9 @@ immaterial."
         (proc nil))
     (grunt--message (format "%s" cmd))
     (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
-    (set-process-filter proc #'grunt--apply-ansi-color)
+    (set-process-filter proc (if grunt-move-task-point
+                                 #'grunt--apply-ansi-color-save-excursion
+                               #'grunt--apply-ansi-color))
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
     (grunt--set-process-buffer-task buf task)
@@ -184,6 +201,18 @@ immaterial."
         (insert string)
         (ansi-color-apply-on-region (process-mark proc) (point))
         (set-marker (process-mark proc) (point))))))
+
+(defun grunt--apply-ansi-color-save-excursion (proc string)
+  "Process filter for PROC to apply ANSI to STRING without mucking with point "
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (let ((inhibit-read-only t))
+        (save-excursion
+          ;; Insert the text, advancing the process marker.
+          (goto-char (process-mark proc))
+          (insert string)
+          (ansi-color-apply-on-region (process-mark proc) (point))
+          (set-marker (process-mark proc) (point)))))))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
