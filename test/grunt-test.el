@@ -90,6 +90,21 @@
        (should (string= "build" (cadr result)))
        (should (eq 2 (length result)))))))
 
+(ert-deftest should-use-valid-grunt-help-command ()
+  (with-grunt-sandbox
+   (let ((grunt-base-command nil)
+         (grunt-help-command (format "%s --help --no-color" grunt-base-command)))
+     ;; pretend like we couldn't resolve grunt-base-command, and that
+     ;; grunt-help-command is in a similar quagmire
+     (noflet ((shell-command-to-string (&rest args) (car args)))
+       (should-not (string-match-p " nil --help" (grunt--get-help)))))))
+
+(ert-deftest should-throw-when-missing-grunt-binary ()
+  (with-grunt-sandbox
+   (noflet ((executable-find (binary) nil))
+     (let ((grunt-base-command nil))
+       (should-error (grunt--command))))))
+
 (ert-deftest should-resolve-registered-tasks-via-regex ()
   (with-grunt-sandbox
    (let ((grunt-show-all-tasks nil))
@@ -102,7 +117,6 @@
               'utf-8
               (f-expand "Gruntfile.js" default-directory))
      (should (string= "test2" (car (grunt-resolve-registered-tasks)))))))
-
 
 (ert-deftest should-include-custom-options ()
   (with-grunt-sandbox
