@@ -1,5 +1,5 @@
 ;;; grunt.el --- Some glue to stick Emacs and Gruntfiles together
-;; Version: 1.2.2
+;; Version: 1.2.4
 
 ;; Copyright (C) 2014  Daniel Gempesaw
 
@@ -59,8 +59,8 @@ You may have to fix this if `grunt' isn't in your PATH."
   :type 'string
   :group 'grunt)
 
-(defcustom grunt-help-command (format "%s --help --no-color" grunt-base-command)
-  "Command to get the help section from grunt."
+(defcustom grunt-help-args "--help --no-color"
+  "Arguments to pass to grunt CLI to get the help section."
   :type 'string
   :group 'grunt)
 
@@ -102,9 +102,9 @@ by grunt modules.
 If nil it will suggest only the user registered tasks.
 
 The default value is t which means that we resolve the tasks
-using the grunt-help-command method.  Since shelling out to run
-`grunt --help` can be slow, we also default to caching the tasks
-for the current project; see `grunt-cache-tasks' for more."
+using the `grunt--help-command' method.  Since shelling out to
+run `grunt --help` can be slow, we also default to caching the
+tasks for the current project; see `grunt-cache-tasks' for more."
   :type '(choice
           (const :tag "Read all tasks including ones loaded by grunt modules" t)
           (const :tag "Read only user registered tasks" nil))
@@ -148,7 +148,7 @@ immaterial."
   (unless (grunt-locate-gruntfile)
     (error "Sorry, we couldn't find a gruntfile.  Consider setting `grunt-current-path' manually?"))
   (when (and pfx (> pfx 1)) (grunt-clear-tasks-cache))
-  (let* ((task (ido-completing-read
+  (let* ((task (completing-read
                 "Execute which task: "
                 (grunt-resolve-registered-tasks) nil nil)))
     (setq grunt-previous-task task)
@@ -213,7 +213,7 @@ just the user registerdTasks."
     (grunt--resolve-registered-tasks-from-gruntfile)))
 
 (defun grunt--resolve-registered-tasks-from-grunthelp ()
-  "Build a list of potential Grunt tasks from grunt-help-command.
+  "Build a list of potential Grunt tasks from `grunt--help-command'.
 
 The list is constructed performing the `grunt --help` command, or
 similar, and narrowing down to the Available tasks section before
@@ -249,7 +249,7 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
                    contents))))
 
 (defun grunt--get-help-tasks ()
-  "Return a list of lines from the tasks region from the `grunt-help-command'."
+  "Return a list of lines from the tasks region from the `grunt--help-command'."
   (with-temp-buffer
     (insert (grunt--get-help))
     (goto-char 0)
@@ -265,8 +265,15 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
 This function will return the cached version of the command if
 the cache is not empty."
   (grunt--message "Building task list from grunt --help, one moment...")
-  (shell-command-to-string
-   (format "cd %s; %s" grunt-current-dir grunt-help-command)))
+  (let ((default-directory grunt-current-dir))
+    (shell-command-to-string (grunt--help-command))))
+
+(defun grunt--help-command ()
+  "Build an appropriate `grunt --help` command for the current project.
+
+Using `grunt--command' to generate the help command ensures that
+we have a valid `grunt-base-command'."
+  (grunt--command grunt-help-args))
 
 (defun grunt-resolve-options ()
   "Set up the arguments to the grunt binary.
@@ -284,8 +291,11 @@ gruntfile and pulls in the user specified `grunt-options'"
 
 (defun grunt--command (task)
   "Return the grunt command for the specified TASK."
+  ;; if necessary, let's lookup the grunt executable again, and throw
+  ;; if we still can't find one...
   (unless grunt-base-command
-    (setq grunt-base-command (executable-find "grunt")))
+    (unless (setq grunt-base-command (executable-find "grunt"))
+      (error "Couldn't locate the grunt executable; please setq `grunt-base-command' manually")))
   (mapconcat 'identity `(,grunt-base-command ,(grunt-resolve-options) ,task) " "))
 
 (defun grunt--message (s)
@@ -342,8 +352,8 @@ This means making it read only and locally binding the 'q' key to quit."
 (define-minor-mode grunt-process-minor-mode
   "Minor mode for grunt process key bindings."
   :init-value nil
-  (define-key grunt-process-minor-mode-map (kbd "g") '(lambda () (interactive) (grunt--run (buffer-local-value 'grunt-buffer-task (current-buffer)))))
-  (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
+  (define-key grunt-process-minor-mode-map (kbd "g") (lambda () (interactive) (grunt--run (buffer-local-value 'grunt-buffer-task (current-buffer)))))
+  (define-key grunt-process-minor-mode-map (kbd "q") (lambda () (interactive) (quit-window))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
