@@ -330,8 +330,8 @@ This means making it read only and locally binding the 'q' key to quit."
 (define-minor-mode grunt-process-minor-mode
   "Minor mode for grunt process key bindings."
   :init-value nil
-  (define-key grunt-process-minor-mode-map (kbd "g") '(lambda () (interactive) (grunt--run (buffer-local-value 'grunt-buffer-task (current-buffer)))))
-  (define-key grunt-process-minor-mode-map (kbd "q") '(lambda () (interactive) (quit-window))))
+  (define-key grunt-process-minor-mode-map (kbd "g") (lambda () (interactive) (grunt--run (buffer-local-value 'grunt-buffer-task (current-buffer)))))
+  (define-key grunt-process-minor-mode-map (kbd "q") (lambda () (interactive) (quit-window))))
 
 (provide 'grunt)
 ;;; grunt.el ends here
