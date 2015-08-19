@@ -101,9 +101,9 @@ by grunt modules.
 If nil it will suggest only the user registered tasks.
 
 The default value is t which means that we resolve the tasks
-using the grunt-help-command method.  Since shelling out to run
-`grunt --help` can be slow, we also default to caching the tasks
-for the current project; see `grunt-cache-tasks' for more."
+using the `grunt--help-command' method.  Since shelling out to
+run `grunt --help` can be slow, we also default to caching the
+tasks for the current project; see `grunt-cache-tasks' for more."
   :type '(choice
           (const :tag "Read all tasks including ones loaded by grunt modules" t)
           (const :tag "Read only user registered tasks" nil))
@@ -192,7 +192,7 @@ just the user registerdTasks."
     (grunt--resolve-registered-tasks-from-gruntfile)))
 
 (defun grunt--resolve-registered-tasks-from-grunthelp ()
-  "Build a list of potential Grunt tasks from grunt-help-command.
+  "Build a list of potential Grunt tasks from `grunt--help-command'.
 
 The list is constructed performing the `grunt --help` command, or
 similar, and narrowing down to the Available tasks section before
@@ -228,7 +228,7 @@ To suggest all valid tasks, see `grunt-show-all-tasks'."
                    contents))))
 
 (defun grunt--get-help-tasks ()
-  "Return a list of lines from the tasks region from the `grunt-help-command'."
+  "Return a list of lines from the tasks region from the `grunt--help-command'."
   (with-temp-buffer
     (insert (grunt--get-help))
     (goto-char 0)
