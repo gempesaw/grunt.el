@@ -6,7 +6,7 @@
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; URL: https://github.com/gempesaw/grunt.el
-;; Package-Requires: ((dash "2.9.0"))
+;; Package-Requires: ((dash "2.9.0") (ansi-color "3.4.2"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'ansi-color)
 
 (defgroup grunt nil
   "Execute grunt tasks from your Gruntfile from Emacs"
@@ -164,13 +165,25 @@ immaterial."
   "Set up the process buffer and run TASK."
   (let ((cmd (grunt--command task))
         (buf (grunt--project-task-buffer task))
-        (ret nil))
+        (proc nil))
     (grunt--message (format "%s" cmd))
-    (setq ret (async-shell-command cmd buf buf))
+    (setq proc (start-process-shell-command (buffer-name buf) buf cmd))
+    (set-process-filter proc #'grunt--apply-ansi-color)
     (grunt--set-process-dimensions buf)
     (grunt--set-process-read-only buf)
     (grunt--set-process-buffer-task buf task)
-    ret))
+  proc))
+
+(defun grunt--apply-ansi-color (proc string)
+  "Filter to function for process PROC to apply ansi color to STRING."
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (let ((inhibit-read-only t))
+        ;; Insert the text, advancing the process marker.
+        (goto-char (process-mark proc))
+        (insert string)
+        (ansi-color-apply-on-region (process-mark proc) (point))
+        (set-marker (process-mark proc) (point))))))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
@@ -180,7 +193,15 @@ immaterial."
     (when (and grunt-kill-existing-buffer buf proc)
       (set-process-query-on-exit-flag proc nil)
       (kill-buffer bufname))
+    (grunt--clear-task-buffer buf)
     (get-buffer-create bufname)))
+
+(defun grunt--clear-task-buffer (buf)
+  "Clears the task buffer BUF.
+Sets the buffer to non read only mode when it's erased, this should be reset
+as soon as the task begins running."
+  (when (buffer-live-p buf)
+    (with-current-buffer buf (let ((inhibit-read-only t)) (erase-buffer)))))
 
 (defun grunt-resolve-registered-tasks ()
   "Build a list of Grunt tasks.
@@ -307,6 +328,7 @@ gruntfile and pulls in the user specified `grunt-options'"
   "Set the dimensions of the process buffer BUF."
   (let ((process (get-buffer-process buf)))
     (when process
+      (display-buffer buf '(nil (allow-no-window . t)))
       (set-process-window-size process
                                (window-height)
                                (window-width)))))
