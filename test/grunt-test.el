@@ -1,5 +1,6 @@
 (require 'f)
 (require 'noflet)
+(require 'ert-async)
 
 ;;; set up copied blatantly from
 ;;; http://tuxicity.se/emacs/testing/cask/ert-runner/2013/09/26/unit-testing-in-emacs.html
@@ -244,3 +245,27 @@
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should (string= "build" (buffer-local-value 'grunt-buffer-task (current-buffer)))))))
+
+(ert-deftest-async should-save-excursion-in-the-process-filter (done)
+  (with-grunt-sandbox
+   (let ((grunt-scroll-output nil))
+     (noflet ((completing-read (&rest any) "build"))
+       (let ((proc (grunt-exec)))
+         (with-current-buffer (process-buffer proc)
+           (goto-char (point-min))
+           (set-process-sentinel proc
+            (lambda (&rest any)
+                (should (eq (point) (point-min)))
+                (funcall done)))))))))
+
+(ert-deftest-async should-not-save-excursion-in-the-process-filter (done)
+  (with-grunt-sandbox
+   (let ((grunt-scroll-output t))
+     (noflet ((completing-read (&rest any) "build"))
+       (let ((proc (grunt-exec)))
+         (with-current-buffer (process-buffer proc)
+           (goto-char (point-min))
+           (set-process-sentinel proc
+            (lambda (&rest any) 
+                (should (eq (point) (point-max)))
+                (funcall done)))))))))

@@ -126,6 +126,14 @@ argument when invoking `grunt-exec'."
   :type 'boolean
   :group 'grunt)
 
+(defcustom grunt-scroll-output t
+  "Whether or not to automatically scroll when display process output.
+
+If t then whilst the grunt task output is being filtered, the content
+will automatically scroll to the latest bit of output.  If nil then
+the users is free to navigate the output buffer whilst the output is
+happening.")
+
 (defvar grunt-current-tasks-cache nil
   "The cache of current grunt tasks.")
 
@@ -179,11 +187,17 @@ immaterial."
   (when (buffer-live-p (process-buffer proc))
     (with-current-buffer (process-buffer proc)
       (let ((inhibit-read-only t))
-        ;; Insert the text, advancing the process marker.
-        (goto-char (process-mark proc))
-        (insert string)
-        (ansi-color-apply-on-region (process-mark proc) (point))
-        (set-marker (process-mark proc) (point))))))
+        (grunt--scroll-body
+         grunt-scroll-output
+         ;; Insert the text, advancing the process marker.
+         (goto-char (process-mark proc))
+         (insert string)
+         (ansi-color-apply-on-region (process-mark proc) (point))
+         (set-marker (process-mark proc) (point)))))))
+
+(defmacro grunt--scroll-body (scroll &rest body)
+  "Switch on SCROLL through the output of a process while executing BODY."
+  `(if ,scroll (progn ,@body) (save-excursion ,@body)))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
