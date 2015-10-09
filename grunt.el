@@ -182,6 +182,10 @@ immaterial."
     (grunt--set-process-buffer-task buf task)
   proc))
 
+(defmacro grunt--scroll-body (scroll &rest body)
+  "Switch on SCROLL through the output of a process while executing BODY."
+  `(if ,scroll (progn ,@body) (save-excursion ,@body)))
+
 (defun grunt--apply-ansi-color (proc string)
   "Filter to function for process PROC to apply ansi color to STRING."
   (when (buffer-live-p (process-buffer proc))
@@ -194,10 +198,6 @@ immaterial."
          (insert string)
          (ansi-color-apply-on-region (process-mark proc) (point))
          (set-marker (process-mark proc) (point)))))))
-
-(defmacro grunt--scroll-body (scroll &rest body)
-  "Switch on SCROLL through the output of a process while executing BODY."
-  `(if ,scroll (progn ,@body) (save-excursion ,@body)))
 
 (defun grunt--project-task-buffer (task)
   "Create a process buffer for the grunt TASK."
