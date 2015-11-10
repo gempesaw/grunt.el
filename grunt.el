@@ -6,7 +6,7 @@
 ;; Author: Daniel Gempesaw <dgempesaw@sharecare.com>
 ;; Keywords: convenience, grunt
 ;; URL: https://github.com/gempesaw/grunt.el
-;; Package-Requires: ((dash "2.9.0") (ansi-color "3.4.2"))
+;; Package-Requires: ((dash "2.9.0") (ansi-color "3.4.2") (emacs "24.3"))
 ;; Created: 2014 Apr 1
 
 ;; This program is free software; you can redistribute it and/or modify
