@@ -140,6 +140,8 @@ happening.")
 (defvar grunt-previous-task nil
   "Previous task that was run.")
 
+(defvar grunt-buffer-task nil)
+
 ;;;###autoload
 (defun grunt-exec (&optional pfx)
   "Run tasks from gruntfile.  Calling with PFX will clear the cache of tasks.
