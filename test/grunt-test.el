@@ -1,5 +1,6 @@
 (require 'f)
 (require 'noflet)
+(require 'ert-async)
 
 ;;; set up copied blatantly from
 ;;; http://tuxicity.se/emacs/testing/cask/ert-runner/2013/09/26/unit-testing-in-emacs.html
@@ -134,12 +135,22 @@
 (ert-deftest should-execute-grunt-commands ()
   (with-grunt-sandbox
    (noflet ((completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+            (start-process-shell-command (&rest args) args)
+            (set-process-filter (p f) nil))
      (let* ((args (grunt-exec))
-            (cmd (car args))
+            (cmd (cadr (cdr args)))
             (buf (buffer-name (cadr args))))
        (should (string-suffix-p "build" cmd))
        (should (string= "*grunt-build*<has-gruntfile>" buf))))))
+
+(ert-deftest should-erase-contents-of-buffer ()
+  (with-grunt-sandbox
+      (let ((called nil)
+            (grunt-kill-existing-buffer nil))
+        (noflet ((completing-read (&rest any) "build")
+                 (erase-buffer () (setq called t)))
+          (grunt-exec)
+          (should called)))))
 
 (ert-deftest should-kill-existing-buffer ()
   (with-grunt-sandbox
@@ -152,7 +163,6 @@
   (with-grunt-sandbox
    (let ((process-resized 0))
      (noflet ((completing-read (&rest any) "build")
-              (async-shell-command (&rest args) args)
               (grunt--set-process-dimensions (buf)
                                              (setq process-resized (1+ process-resized))))
        (grunt-exec)
@@ -160,11 +170,27 @@
 
 (ert-deftest should-set-process-to-read-only ()
   (with-grunt-sandbox
-   (noflet ((completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+   (noflet ((completing-read (&rest any) "build"))
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should buffer-read-only))))
+
+(ert-deftest should-set-process-filter-to-apply-ansi-color ()
+  (with-grunt-sandbox
+   (let ((called nil))
+     (noflet ((completing-read (&rest any) "build")
+              (set-process-filter (p f) (setq called t)))
+             (grunt-exec)
+             (should called)))))
+
+(ert-deftest should-apply-ansi-color-to-the-string ()
+  (with-grunt-sandbox
+   (let ((called nil))
+     (noflet ((completing-read (&rest any) "build")
+              (ansi-color-apply-on-region () (setq called t)))
+      (grunt-exec)
+      ;; (should called)
+      ))))
 
 (ert-deftest should-not-clear-cache-with-same-gruntfile ()
   (with-grunt-sandbox
@@ -203,22 +229,43 @@
   (with-grunt-sandbox
    (let ((cleared-cache nil))
      (noflet ((completing-read (&rest any) "build")
-              (async-shell-command (&rest args) args)
               (grunt-clear-tasks-cache () (setq cleared-cache t)))
        (grunt-exec 4)
        (should cleared-cache)))))
 
 (ert-deftest should-set-the-previous-task ()
   (with-grunt-sandbox
-   (noflet ((completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+   (noflet ((completing-read (&rest any) "build"))
      (grunt-exec)
      (should (string= "build" grunt-previous-task)))))
 
 (ert-deftest should-set-the-buffer-local-task ()
   (with-grunt-sandbox
-   (noflet ((completing-read (&rest any) "build")
-            (async-shell-command (&rest args) args))
+   (noflet ((completing-read (&rest any) "build"))
      (grunt-exec)
      (set-buffer "*grunt-build*<has-gruntfile>")
      (should (string= "build" (buffer-local-value 'grunt-buffer-task (current-buffer)))))))
+
+(ert-deftest-async should-save-excursion-in-the-process-filter (done)
+  (with-grunt-sandbox
+   (let ((grunt-scroll-output nil))
+     (noflet ((completing-read (&rest any) "build"))
+       (let ((proc (grunt-exec)))
+         (with-current-buffer (process-buffer proc)
+           (goto-char (point-min))
+           (set-process-sentinel proc
+            (lambda (&rest any)
+                (should (eq (point) (point-min)))
+                (funcall done)))))))))
+
+(ert-deftest-async should-not-save-excursion-in-the-process-filter (done)
+  (with-grunt-sandbox
+   (let ((grunt-scroll-output t))
+     (noflet ((completing-read (&rest any) "build"))
+       (let ((proc (grunt-exec)))
+         (with-current-buffer (process-buffer proc)
+           (goto-char (point-min))
+           (set-process-sentinel proc
+            (lambda (&rest any) 
+                (should (eq (point) (point-max)))
+                (funcall done)))))))))
