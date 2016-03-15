@@ -210,7 +210,10 @@ immaterial."
       (set-process-query-on-exit-flag proc nil)
       (kill-buffer bufname))
     (grunt--clear-task-buffer buf)
-    (get-buffer-create bufname)))
+    (prog1
+        (get-buffer-create bufname)
+      (with-current-buffer bufname
+        (compilation-mode)))))
 
 (defun grunt--clear-task-buffer (buf)
   "Clears the task buffer BUF.
