@@ -180,7 +180,10 @@ immaterial."
     (when (and grunt-kill-existing-buffer buf proc)
       (set-process-query-on-exit-flag proc nil)
       (kill-buffer bufname))
-    (get-buffer-create bufname)))
+    (prog1
+        (get-buffer-create bufname)
+      (with-current-buffer bufname
+        (compilation-mode)))))
 
 (defun grunt-resolve-registered-tasks ()
   "Build a list of Grunt tasks.
